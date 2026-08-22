@@ -4,7 +4,9 @@ export const destinations = [
     name: "Pokhara",
     country: "Nepal",
     image:
-      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80",
+      "/images/pokhara.png",
+      
+       imagePosition: "center 35%",
     description: "Lakeside views with the Annapurna range as your backdrop.",
   },
   {
@@ -12,7 +14,8 @@ export const destinations = [
     name: "Bali",
     country: "Indonesia",
     image:
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+      "/images/bali.png",
+        imagePosition: "center 25%",
     description: "Beaches, temples, and rice terraces in one island.",
   },
   {
@@ -20,7 +23,8 @@ export const destinations = [
     name: "Santorini",
     country: "Greece",
     image:
-      "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80",
+      "/images/santorini.png",
+      imagePosition: "center 40%",
     description: "Whitewashed cliffside villages over the Aegean Sea.",
   },
     {
@@ -28,7 +32,8 @@ export const destinations = [
     name: "Kathmandu",
     country: "Nepal",
     image:
-      "https://images.unsplash.com/photo-1669557582081-274a568aff4d?w=800&q=80",
+      "https://images.unsplash.com/photo-1605640797058-58b7040a0e61?w=800&q=80",
+      imagePosition: "center 15%",
     description: "Ancient temples and vibrant streets in the Kathmandu Valley.",
   },
     {
@@ -37,6 +42,7 @@ export const destinations = [
     country: "Nepal",
     image:
       "https://images.unsplash.com/photo-1762209969249-ff0fd8e13a1b?w=800&q=80",
+      imagePosition: "center 60%",
     description: "Jungle safaris and wildlife in a UNESCO World Heritage park.",
   },
   {
@@ -45,6 +51,7 @@ export const destinations = [
     country: "United Arab Emirates",
     image:
       "https://images.unsplash.com/photo-1748373452031-ee1ae4eb624d?w=800&q=80",
+      imagePosition: "center 40%",
     description: "Futuristic skyline, Burj Khalifa, and desert adventures.",
   },
 ];
