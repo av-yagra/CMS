@@ -97,7 +97,7 @@ export default function Home() {
         <h2 className="font-heading text-2xl md:text-3xl font-bold text-zinc-900">
           Ready to start your journey?
         </h2>
-        <p className="text-zinc-600 mt-2">Take the first step — your Paila — today.</p>
+        <p className="text-zinc-600 mt-2">Take the first step today.</p>
         <Link
           href="/contact"
           className="inline-block mt-6 bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 rounded-full transition-colors"

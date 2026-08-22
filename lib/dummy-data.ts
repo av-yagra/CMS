@@ -31,6 +31,22 @@ export const destinations = [
       "https://images.unsplash.com/photo-1669557582081-274a568aff4d?w=800&q=80",
     description: "Ancient temples and vibrant streets in the Kathmandu Valley.",
   },
+    {
+    id: "chitwan",
+    name: "Chitwan",
+    country: "Nepal",
+    image:
+      "https://images.unsplash.com/photo-1762209969249-ff0fd8e13a1b?w=800&q=80",
+    description: "Jungle safaris and wildlife in a UNESCO World Heritage park.",
+  },
+  {
+    id: "dubai",
+    name: "Dubai",
+    country: "United Arab Emirates",
+    image:
+      "https://images.unsplash.com/photo-1748373452031-ee1ae4eb624d?w=800&q=80",
+    description: "Futuristic skyline, Burj Khalifa, and desert adventures.",
+  },
 ];
 
 export const packages = [
