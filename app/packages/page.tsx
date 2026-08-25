@@ -3,25 +3,25 @@
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
-import DestinationCard from "@/components/shared/DestinationCard";
-import { destinations } from "@/lib/dummy-data";
+import PackageCard from "@/components/shared/PackageCard";
+import { packages } from "@/lib/dummy-data";
 
-function DestinationsContent() {
+function PackagesContent() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
 
-  const filtered = destinations.filter((d) =>
-    `${d.name} ${d.country}`.toLowerCase().includes(query.toLowerCase())
+  const filtered = packages.filter((p) =>
+    `${p.title} ${p.destination}`.toLowerCase().includes(query.toLowerCase())
   );
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-16">
       <div className="text-center mb-10">
         <h1 className="font-heading text-3xl md:text-4xl font-bold text-zinc-900">
-          Explore Destinations
+          Tour Packages
         </h1>
         <p className="text-zinc-600 mt-2">
-          Find your next adventure from our handpicked locations.
+          Complete trips, planned and priced — pick one and go.
         </p>
       </div>
 
@@ -31,30 +31,30 @@ function DestinationsContent() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by destination or country..."
+          placeholder="Search by package or destination..."
           className="w-full pl-11 pr-4 py-3 rounded-full border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
 
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {filtered.map((d) => (
-            <DestinationCard key={d.id} {...d} />
+          {filtered.map((p) => (
+            <PackageCard key={p.id} {...p} />
           ))}
         </div>
       ) : (
         <p className="text-center text-zinc-500">
-          No destinations match &quot;{query}&quot;. Try a different search.
+          No packages match &quot;{query}&quot;. Try a different search.
         </p>
       )}
     </section>
   );
 }
 
-export default function DestinationsPage() {
+export default function PackagesPage() {
   return (
     <Suspense fallback={null}>
-      <DestinationsContent />
+      <PackagesContent />
     </Suspense>
   );
 }

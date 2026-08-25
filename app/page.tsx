@@ -7,31 +7,90 @@ import StatsCounter from "@/components/shared/StatsCounter";
 import Testimonials from "@/components/shared/Testimonials";
 import { destinations, packages } from "@/lib/dummy-data";
 
+import HeroSlideshow from "@/components/shared/HeroSlideshow";
+import HeroSearch from "@/components/shared/HeroSearch";
+
+const heroImages = [
+  { id: "pokhara", image: destinations[0].image, imagePosition: destinations[0].imagePosition, name: destinations[0].name },
+  { id: "everest-base-camp", image: packages[0].image, name: packages[0].title },
+  { id: "santorini", image: destinations[2].image, imagePosition: destinations[2].imagePosition, name: destinations[2].name },
+  { id: "bali-getaway", image: packages[1].image, name: packages[1].title },
+  { id: "dubai", image: destinations[5].image, imagePosition: destinations[5].imagePosition, name: destinations[5].name },
+];
 const whyChooseUs = [
-  { icon: ShieldCheck, title: "Trusted Trips", text: "Verified tours and transparent pricing, every time." },
-  { icon: MapPinned, title: "Handpicked Destinations", text: "Curated locations, not generic tourist traps." },
-  { icon: Wallet, title: "Fair Pricing", text: "No hidden fees — what you see is what you pay." },
-  { icon: HeadphonesIcon, title: "Real Support", text: "Reach a real person before, during, and after your trip." },
+  {
+    icon: ShieldCheck,
+    title: "Trusted Trips",
+    text: "Verified tours and transparent pricing, every time.",
+    tint: "primary",
+  },
+  {
+    icon: MapPinned,
+    title: "Handpicked Destinations",
+    text: "Curated locations, not generic tourist traps.",
+    tint: "accent",
+  },
+  {
+    icon: Wallet,
+    title: "Fair Pricing",
+    text: "No hidden fees — what you see is what you pay.",
+    tint: "primary",
+  },
+  {
+    icon: HeadphonesIcon,
+    title: "Real Support",
+    text: "Reach a real person before, during, and after your trip.",
+    tint: "accent",
+  },
 ];
 
 export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-24 text-center">
-        <h1 className="font-heading text-4xl md:text-5xl font-bold text-zinc-900">
-          Discover Your Next Adventure
-        </h1>
-        <p className="mt-4 text-lg text-zinc-600 max-w-xl mx-auto">
-          Handpicked destinations and tour packages, wherever you want to go.
-        </p>
-        <Link
-          href="/packages"
-          className="inline-block mt-8 bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-full transition-colors"
-        >
-          Explore Packages
-        </Link>
-      </section>
+      <section className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 overflow-hidden">
+  {/* subtle background texture, sits behind everything in this section */}
+  <svg
+    className="absolute -top-10 left-0 w-105 text-primary/10 pointer-events-none"
+    viewBox="0 0 400 300"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M10,150 C60,80 120,220 180,140 C230,75 260,180 340,120"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeDasharray="1 10"
+      strokeLinecap="round"
+    />
+    <path
+      d="M0,220 C70,260 140,180 220,240 C280,285 320,230 400,260"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeDasharray="1 10"
+      strokeLinecap="round"
+    />
+  </svg>
+
+  <div className="relative grid md:grid-cols-2 gap-10 items-center">
+    <div className="text-center md:text-left">
+      <p className="text-xs font-semibold tracking-widest uppercase text-accent mb-4">
+        Nepal &amp; Beyond
+      </p>
+      <h1 className="font-heading text-4xl md:text-6xl font-bold text-zinc-900 leading-[1.05]">
+        Discover Your Next Adventure
+      </h1>
+      <p className="mt-5 mb-6 text-lg text-zinc-600 max-w-md mx-auto md:mx-0">
+        Handpicked destinations and tour packages, wherever you want to go.
+      </p>
+      <HeroSearch />
+    </div>
+
+    <div className="relative h-105 md:h-140 md:-mr-10">
+      <HeroSlideshow images={heroImages} />
+    </div>
+  </div>
+</section>
 
       <DestinationStrip />
       <StatsCounter />
@@ -42,7 +101,10 @@ export default function Home() {
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-zinc-900">
             Featured Destinations
           </h2>
-          <Link href="/destinations" className="text-sm font-medium text-primary hover:underline">
+          <Link
+            href="/destinations"
+            className="text-sm font-medium text-primary hover:underline"
+          >
             View all
           </Link>
         </div>
@@ -59,7 +121,10 @@ export default function Home() {
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-zinc-900">
             Popular Packages
           </h2>
-          <Link href="/packages" className="text-sm font-medium text-primary hover:underline">
+          <Link
+            href="/packages"
+            className="text-sm font-medium text-primary hover:underline"
+          >
             View all
           </Link>
         </div>
@@ -76,13 +141,24 @@ export default function Home() {
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-zinc-900 text-center mb-12">
             Why Travel With Paila
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-            {whyChooseUs.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="text-center">
-                <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-full bg-primary/10 text-primary mb-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {whyChooseUs.map(({ icon: Icon, title, text, tint }) => (
+              <div
+                key={title}
+                className="text-center p-6 rounded-2xl border border-black/5 hover:border-black/10 hover:-translate-y-1 transition-all duration-200"
+              >
+                <div
+                  className={`mx-auto w-12 h-12 flex items-center justify-center rounded-xl mb-4 ${
+                    tint === "primary"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-accent/10 text-accent"
+                  }`}
+                >
                   <Icon size={22} />
                 </div>
-                <p className="font-heading font-semibold text-zinc-900">{title}</p>
+                <p className="font-heading font-semibold text-zinc-900">
+                  {title}
+                </p>
                 <p className="text-sm text-zinc-600 mt-1">{text}</p>
               </div>
             ))}
