@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu, X, LogOut } from "lucide-react";
 
 const navLinks = [
   { href: "/destinations", label: "Destinations" },
@@ -13,12 +14,26 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header className="border-b border-black/5 bg-white/80 backdrop-blur sticky top-0 z-50">
+    <header
+      className={`sticky top-0 z-50 bg-white/80 backdrop-blur border-b transition-shadow ${
+        scrolled ? "border-black/5 shadow-sm" : "border-transparent"
+      }`}
+    >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="font-heading font-bold text-xl text-primary">
-          Paila
+        <Link href="/" className="flex items-center gap-2">
+          <span className="font-heading font-bold text-xl text-primary">Paila</span>
         </Link>
 
         {/* Desktop nav */}
@@ -35,6 +50,39 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          {/* Auth-aware section, desktop only */}
+          <div className="hidden sm:flex items-center gap-3">
+            {status === "authenticated" ? (
+              <>
+                <span className="text-sm text-zinc-600">
+                  Hi, {session.user?.name?.split(" ")[0]}
+                </span>
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center gap-1.5 text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
+                >
+                  <LogOut size={15} />
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 px-4 py-2 rounded-full transition-colors"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
+
           <Link
             href="/packages"
             className="hidden sm:inline-block bg-accent hover:bg-accent-dark text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
@@ -42,7 +90,6 @@ export default function Navbar() {
             Book Now
           </Link>
 
-          {/* Hamburger button - mobile only */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 text-zinc-700"
@@ -66,6 +113,31 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          <div className="border-t border-black/5 pt-4 flex flex-col gap-3">
+            {status === "authenticated" ? (
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  signOut();
+                }}
+                className="flex items-center gap-1.5 text-sm font-medium text-zinc-700"
+              >
+                <LogOut size={15} />
+                Log out ({session.user?.name?.split(" ")[0]})
+              </button>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-zinc-700">
+                  Log in
+                </Link>
+                <Link href="/signup" onClick={() => setIsOpen(false)} className="text-sm font-medium text-primary">
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
+
           <Link
             href="/packages"
             onClick={() => setIsOpen(false)}
