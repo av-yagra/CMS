@@ -22,39 +22,27 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6 py-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
         {/* Brand */}
         <div>
-          <p className="font-heading font-bold text-xl">Paila</p>
-          <p className="text-sm text-white/70 mt-3 leading-relaxed">
-            Paila means&quot;the first step&quot; — every great journey begins
-            with one. Handpicked destinations and tour packages, curated for
-            unforgettable adventures.
-          </p>
+  <div className="flex items-center gap-2">
+    <p className="font-heading font-bold text-xl">Paila</p>
+  </div>
+  <p className="text-sm text-white/70 mt-3 leading-relaxed">
+    Paila means &quot;the first step&quot; — every great journey begins
+    with one. Handpicked destinations and tour packages, curated for
+    unforgettable adventures.
+  </p>
 
-          <div className="flex gap-4 mt-4">
-            <a
-              href="#"
-              aria-label="Facebook"
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              <FaFacebook size={18} />
-            </a>
-
-            <a
-              href="#"
-              aria-label="Instagram"
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              <FaInstagram size={18} />
-            </a>
-
-            <a
-              href="#"
-              aria-label="Twitter"
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              <FaTwitter size={18} />
-            </a>
-          </div>
-        </div>
+  <div className="flex gap-4 mt-4">
+    <a href="#" aria-label="Facebook" className="text-white/70 hover:text-white transition-colors">
+      <FaFacebook size={18} />
+    </a>
+    <a href="#" aria-label="Instagram" className="text-white/70 hover:text-white transition-colors">
+      <FaInstagram size={18} />
+    </a>
+    <a href="#" aria-label="Twitter" className="text-white/70 hover:text-white transition-colors">
+      <FaTwitter size={18} />
+    </a>
+  </div>
+</div>
 
         {/* Quick Links */}
         <div>
