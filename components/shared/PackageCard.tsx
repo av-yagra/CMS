@@ -1,6 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { Clock } from "lucide-react";
+import { Clock, Heart } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 type Props = {
   id: string;
@@ -13,6 +16,15 @@ type Props = {
 };
 
 export default function PackageCard({ id, title, destination, duration, price, image, badge }: Props) {
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const saved = isWishlisted(id);
+
+  function handleHeartClick(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(id);
+  }
+
   return (
     <Link
       href={`/packages/${id}`}
@@ -29,10 +41,17 @@ export default function PackageCard({ id, title, destination, duration, price, i
           {destination}
         </span>
         {badge && (
-          <span className="absolute top-3 right-3 bg-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+          <span className="absolute top-3 right-12 bg-primary text-white text-xs font-semibold px-2.5 py-1 rounded-full">
             {badge}
           </span>
         )}
+        <button
+          onClick={handleHeartClick}
+          aria-label={saved ? "Remove from wishlist" : "Add to wishlist"}
+          className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white transition-colors cursor-pointer"
+        >
+          <Heart size={16} className={saved ? "fill-accent text-accent" : "text-zinc-500"} />
+        </button>
       </div>
       <div className="p-4">
         <p className="font-heading font-semibold text-lg text-zinc-900">{title}</p>

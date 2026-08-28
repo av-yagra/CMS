@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, Heart, LogOut } from "lucide-react";
+import { useWishlist } from "@/context/WishlistContext";
 
 const navLinks = [
   { href: "/destinations", label: "Destinations" },
@@ -16,6 +17,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { data: session, status } = useSession();
+  const { wishlist } = useWishlist();
 
   useEffect(() => {
     function handleScroll() {
@@ -33,7 +35,9 @@ export default function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading font-bold text-xl text-primary">Paila</span>
+          <span className="font-heading font-bold text-xl text-primary">
+            Paila
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -50,6 +54,18 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/wishlist"
+            aria-label="Wishlist"
+            className="relative hidden sm:flex items-center justify-center w-9 h-9 rounded-full hover:bg-black/5 transition-colors"
+          >
+            <Heart size={18} className="text-zinc-700" />
+            {wishlist.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center rounded-full bg-accent text-white text-[10px] font-semibold">
+                {wishlist.length}
+              </span>
+            )}
+          </Link>
           {/* Auth-aware section, desktop only */}
           <div className="hidden sm:flex items-center gap-3">
             {status === "authenticated" ? (
@@ -114,6 +130,15 @@ export default function Navbar() {
             </Link>
           ))}
 
+          <Link
+            href="/wishlist"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-2 text-sm font-medium text-zinc-700"
+          >
+            <Heart size={16} />
+            Wishlist {wishlist.length > 0 && `(${wishlist.length})`}
+          </Link>
+
           <div className="border-t border-black/5 pt-4 flex flex-col gap-3">
             {status === "authenticated" ? (
               <button
@@ -128,10 +153,18 @@ export default function Navbar() {
               </button>
             ) : (
               <>
-                <Link href="/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-zinc-700">
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-zinc-700"
+                >
                   Log in
                 </Link>
-                <Link href="/signup" onClick={() => setIsOpen(false)} className="text-sm font-medium text-primary">
+                <Link
+                  href="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-primary"
+                >
                   Sign up
                 </Link>
               </>
