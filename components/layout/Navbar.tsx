@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, Heart, LogOut } from "lucide-react";
@@ -16,15 +16,29 @@ const navLinks = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
   const { wishlist } = useWishlist();
 
+  // Nav shadow on scroll
   useEffect(() => {
     function handleScroll() {
       setScrolled(window.scrollY > 8);
     }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close the profile dropdown when clicking anywhere outside it
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -35,9 +49,7 @@ export default function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading font-bold text-xl text-primary">
-            Paila
-          </span>
+          <span className="font-heading font-bold text-xl text-primary">Paila</span>
         </Link>
 
         {/* Desktop nav */}
@@ -66,38 +78,23 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-          {/* Auth-aware section, desktop only */}
-          <div className="hidden sm:flex items-center gap-3">
-            {status === "authenticated" ? (
-              <>
-                <span className="text-sm text-zinc-600">
-                  Hi, {session.user?.name?.split(" ")[0]}
-                </span>
-                <button
-                  onClick={() => signOut()}
-                  className="flex items-center gap-1.5 text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
-                >
-                  <LogOut size={15} />
-                  Log out
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 px-4 py-2 rounded-full transition-colors"
-                >
-                  Sign up
-                </Link>
-              </>
-            )}
-          </div>
+
+          {status === "unauthenticated" && (
+            <div className="hidden sm:flex items-center gap-3">
+              <Link
+                href="/login"
+                className="text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 px-4 py-2 rounded-full transition-colors"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
 
           <Link
             href="/packages"
@@ -105,6 +102,39 @@ export default function Navbar() {
           >
             Book Now
           </Link>
+
+          {status === "authenticated" && (
+            <div className="relative hidden sm:block" ref={profileRef}>
+              <button
+                onClick={() => setProfileOpen((prev) => !prev)}
+                aria-label="Account menu"
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-primary/10 text-primary font-heading font-semibold text-sm hover:bg-primary/20 transition-colors cursor-pointer"
+              >
+                {session.user?.name?.charAt(0).toUpperCase() ?? "U"}
+              </button>
+
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-xl border border-black/5 bg-white shadow-lg p-4 z-50">
+                  <p className="text-sm font-semibold text-zinc-900 truncate">
+                    {session.user?.name}
+                  </p>
+                  <p className="text-xs text-zinc-500 break-all mt-0.5">
+                    {session.user?.email}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setProfileOpen(false);
+                      signOut({ callbackUrl: "/" });
+                    }}
+                    className="mt-3 w-full flex items-center justify-center gap-2 text-sm font-semibold text-red-500 border border-red-100 hover:bg-red-50 rounded-full py-2 transition-colors cursor-pointer"
+                  >
+                    <LogOut size={15} />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -139,35 +169,31 @@ export default function Navbar() {
             Wishlist {wishlist.length > 0 && `(${wishlist.length})`}
           </Link>
 
-          <div className="border-t border-black/5 pt-4 flex flex-col gap-3">
+          <div className="border-t border-black/5 pt-4">
             {status === "authenticated" ? (
-              <button
-                onClick={() => {
-                  setIsOpen(false);
-                  signOut();
-                }}
-                className="flex items-center gap-1.5 text-sm font-medium text-zinc-700"
-              >
-                <LogOut size={15} />
-                Log out ({session.user?.name?.split(" ")[0]})
-              </button>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-zinc-700"
+              <div>
+                <p className="text-sm font-semibold text-zinc-900">{session.user?.name}</p>
+                <p className="text-xs text-zinc-500 break-all mt-0.5">{session.user?.email}</p>
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    signOut({ callbackUrl: "/" });
+                  }}
+                  className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-red-500"
                 >
+                  <LogOut size={15} />
+                  Log Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <Link href="/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-zinc-700">
                   Log in
                 </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-primary"
-                >
+                <Link href="/signup" onClick={() => setIsOpen(false)} className="text-sm font-medium text-primary">
                   Sign up
                 </Link>
-              </>
+              </div>
             )}
           </div>
 

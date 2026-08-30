@@ -1,19 +1,18 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-
-type WishlistContextType = {
-  wishlist: string[];
-  toggleWishlist: (id: string) => void;
-  isWishlisted: (id: string) => boolean;
-};
-
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
+import { createContext, useContext, useSyncExternalStore } from "react";
 
 const STORAGE_KEY = "paila-wishlist";
 
-function getInitialWishlist(): string[] {
-  if (typeof window === "undefined") return []; // no localStorage during server rendering
+// --- The external store itself: plain variables + a list of listeners.
+// This lives OUTSIDE the React component, at module level, because it's
+// meant to represent state that exists independently of any one component.
+let currentValue: string[] = [];
+let listeners: (() => void)[] = [];
+
+const EMPTY: string[] = [];
+
+function loadFromStorage(): string[] {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -22,23 +21,56 @@ function getInitialWishlist(): string[] {
   }
 }
 
-export function WishlistProvider({ children }: { children: React.ReactNode }) {
-  // Lazy initializer: this function runs once, right before the first render,
-  // instead of an effect running after render and calling setState.
-  const [wishlist, setWishlist] = useState<string[]>(getInitialWishlist);
+function emitChange() {
+  for (const listener of listeners) listener();
+}
 
-  // This effect is fine as-is: it's reacting to wishlist CHANGES and pushing them
-  // out to localStorage (an external system) — that's exactly what effects are for.
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(wishlist));
-    } catch {
-      // localStorage can fail in private browsing on some browsers — safe to ignore
-    }
-  }, [wishlist]);
+function setWishlistValue(updater: (prev: string[]) => string[]) {
+  currentValue = updater(currentValue);
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentValue));
+  } catch {
+    // e.g. private browsing mode blocking storage — safe to ignore
+  }
+  emitChange();
+}
+
+// --- The three functions useSyncExternalStore needs:
+function subscribe(listener: () => void) {
+  listeners.push(listener);
+  return () => {
+    listeners = listeners.filter((l) => l !== listener);
+  };
+}
+
+function getSnapshot(): string[] {
+  return currentValue;
+}
+
+function getServerSnapshot(): string[] {
+  return EMPTY; // same reference every time — never a "new" empty array
+}
+
+// Populate the real value once, as soon as this module loads in the browser
+// (this line never runs on the server, since `window` won't exist there).
+if (typeof window !== "undefined") {
+  currentValue = loadFromStorage();
+}
+
+// --- React Context wrapper, same public API as before
+type WishlistContextType = {
+  wishlist: string[];
+  toggleWishlist: (id: string) => void;
+  isWishlisted: (id: string) => boolean;
+};
+
+const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
+
+export function WishlistProvider({ children }: { children: React.ReactNode }) {
+  const wishlist = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function toggleWishlist(id: string) {
-    setWishlist((prev) =>
+    setWishlistValue((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   }

@@ -17,6 +17,7 @@ const heroImages = [
   { id: "bali-getaway", image: packages[1].image, name: packages[1].title },
   { id: "dubai", image: destinations[5].image, imagePosition: destinations[5].imagePosition, name: destinations[5].name },
 ];
+
 const whyChooseUs = [
   {
     icon: ShieldCheck,
@@ -48,49 +49,52 @@ export default function Home() {
   return (
     <>
       {/* Hero */}
-      <section className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 overflow-hidden">
-  {/* subtle background texture, sits behind everything in this section */}
-  <svg
-    className="absolute -top-10 left-0 w-105 text-primary/10 pointer-events-none"
-    viewBox="0 0 400 300"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M10,150 C60,80 120,220 180,140 C230,75 260,180 340,120"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeDasharray="1 10"
-      strokeLinecap="round"
-    />
-    <path
-      d="M0,220 C70,260 140,180 220,240 C280,285 320,230 400,260"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeDasharray="1 10"
-      strokeLinecap="round"
-    />
-  </svg>
+      <section className="relative max-w-6xl mx-auto px-6 pt-16 pb-20">
+        {/* subtle background texture, sits behind everything in this section */}
+        <svg
+          className="absolute -top-10 left-0 w-105 text-primary/10 pointer-events-none"
+          viewBox="0 0 400 300"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M10,150 C60,80 120,220 180,140 C230,75 260,180 340,120"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray="1 10"
+            strokeLinecap="round"
+          />
+          <path
+            d="M0,220 C70,260 140,180 220,240 C280,285 320,230 400,260"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeDasharray="1 10"
+            strokeLinecap="round"
+          />
+        </svg>
 
-  <div className="relative grid md:grid-cols-2 gap-10 items-center">
-    <div className="text-center md:text-left">
-      <p className="text-xs font-semibold tracking-widest uppercase text-accent mb-4">
-        Nepal &amp; Beyond
-      </p>
-      <h1 className="font-heading text-4xl md:text-6xl font-bold text-zinc-900 leading-[1.05]">
-        Discover Your Next Adventure
-      </h1>
-      <p className="mt-5 mb-6 text-lg text-zinc-600 max-w-md mx-auto md:mx-0">
-        Handpicked destinations and tour packages, wherever you want to go.
-      </p>
-      <HeroSearch />
-    </div>
+        <div className="relative grid md:grid-cols-2 gap-10 items-center">
+          <div className="text-center md:text-left">
+            <p className="text-xs font-semibold tracking-widest uppercase text-accent mb-4">
+              Nepal &amp; Beyond
+            </p>
+            <h1 className="font-heading text-4xl md:text-6xl font-bold text-zinc-900 leading-[1.05]">
+              Discover Your Next Adventure
+            </h1>
+            <p className="mt-5 text-lg text-zinc-600 max-w-md mx-auto md:mx-0">
+              Handpicked destinations and tour packages, wherever you want to go.
+            </p>
 
-    <div className="relative h-105 md:h-140 md:-mr-10">
-      <HeroSlideshow images={heroImages} />
-    </div>
-  </div>
-</section>
+            <div className="mt-6 relative z-20 md:w-[135%]">
+              <HeroSearch />
+            </div>
+          </div>
+
+          <div className="relative h-105 md:h-140 md:-mr-10">
+            <HeroSlideshow images={heroImages} />
+          </div>
+        </div>
+      </section>
 
       <DestinationStrip />
       <StatsCounter />
