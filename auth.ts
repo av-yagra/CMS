@@ -39,6 +39,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null;
                 }
 
+                // Require email verification, but don't break old users without the field
+                if (user.emailVerified === false) {
+                    // It is safer to return null here, consistent with other validation checks, 
+                    // or throw an error. Returning null mimics standard behavior for unauthorized.
+                    return null;
+                }
+
                 // f. Use verifyPassword to compare
                 const isValid = await verifyPassword(password, user.passwordHash);
 

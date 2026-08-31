@@ -12,12 +12,17 @@ const roleWeights: Record<Role, number> = {
     admin: 3,
 };
 
-// Define a unified signature for route handlers safely bypassing the complexity 
-// of Next.js internal context typings, while remaining strictly secure
+// Type for Next.js App Router route context
+// This includes route parameters from dynamic segments like [id]
+export type RouteContext = {
+    params: Promise<Record<string, string | string[]>>;
+};
+
+// Define a unified signature for route handlers with proper type safety
 export type AuthenticatedRouteHandler = (
     req: Request,
     session: Session,
-    context: any
+    context: RouteContext
 ) => Promise<NextResponse | Response> | NextResponse | Response;
 
 /**
@@ -32,7 +37,7 @@ export function withAuth(
     handler: AuthenticatedRouteHandler,
     minimumRole: Role = "user"
 ) {
-    return async (req: Request, context: any) => {
+    return async (req: Request, context: RouteContext) => {
         try {
             // Retrieve session natively initialized by Auth.js using the JWT cookie
             const session = await auth();

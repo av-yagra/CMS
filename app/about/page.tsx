@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Compass, Users, Leaf, ShieldCheck, Sparkles, Fingerprint, MapPin } from "lucide-react";
+import { Users, ShieldCheck, Sparkles, Fingerprint, MapPin } from "lucide-react";
 
 const paila = [
   { letter: "P", icon: Sparkles, word: "Personalized", text: "Itineraries built around you, not pulled from a template.", tint: "primary" },

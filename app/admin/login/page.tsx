@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in as admin
+  if (session?.user?.role === "admin") {
+    router.push("/admin/dashboard");
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -33,8 +39,16 @@ export default function AdminLoginPage() {
       return;
     }
 
-    // NOTE: once auth.ts adds a session callback exposing `role`,
-    // add a check here to reject non-admins before redirecting.
+    // Fetch the session to check the user's role
+    // Note: Backend authorization via withAuth is still the real security boundary
+    const response = await fetch("/api/auth/session");
+    const sessionData = await response.json();
+    
+    if (sessionData?.user?.role !== "admin") {
+      setError("Access denied. Admin privileges required.");
+      return;
+    }
+
     router.push("/admin/dashboard");
     router.refresh();
   }
