@@ -34,7 +34,10 @@ export default function Navbar() {
   // Close the profile dropdown when clicking anywhere outside it
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node)
+      ) {
         setProfileOpen(false);
       }
     }
@@ -44,13 +47,15 @@ export default function Navbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 bg-white/80 backdrop-blur border-b transition-shadow ${
-        scrolled ? "border-black/5 shadow-sm" : "border-transparent"
+      className={`sticky top-0 z-50 bg-white border-b border-black/10 shadow-sm transition-shadow ${
+        scrolled ? "shadow-md" : ""
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading font-bold text-xl text-primary">Paila</span>
+          <span className="font-heading font-bold text-xl text-primary">
+            Paila
+          </span>
         </Link>
 
         {/* Desktop nav */}
@@ -173,8 +178,12 @@ export default function Navbar() {
           <div className="border-t border-black/5 pt-4">
             {status === "authenticated" ? (
               <div>
-                <p className="text-sm font-semibold text-zinc-900">{session.user?.name}</p>
-                <p className="text-xs text-zinc-500 break-all mt-0.5">{session.user?.email}</p>
+                <p className="text-sm font-semibold text-zinc-900">
+                  {session.user?.name}
+                </p>
+                <p className="text-xs text-zinc-500 break-all mt-0.5">
+                  {session.user?.email}
+                </p>
                 <button
                   onClick={() => {
                     setIsOpen(false);
@@ -188,10 +197,18 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                <Link href="/login" onClick={() => setIsOpen(false)} className="text-sm font-medium text-zinc-700">
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-zinc-700"
+                >
                   Log in
                 </Link>
-                <Link href="/signup" onClick={() => setIsOpen(false)} className="text-sm font-medium text-primary">
+                <Link
+                  href="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-primary"
+                >
                   Sign up
                 </Link>
               </div>

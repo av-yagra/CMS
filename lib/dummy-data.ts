@@ -3,56 +3,85 @@ export const destinations = [
     id: "pokhara",
     name: "Pokhara",
     country: "Nepal",
-    image:
-      "/images/pokhara.png",
-      
-       imagePosition: "center 35%",
+    image: "/images/pokhara.png",
+    imagePosition: "center 35%",
     description: "Lakeside views with the Annapurna range as your backdrop.",
+    highlights: [
+      "Boating on Phewa Lake with Annapurna reflections",
+      "Sunrise views from Sarangkot",
+      "Gateway to the Annapurna trekking region",
+    ],
+    bestTimeToVisit: "October to April, when skies are clearest for mountain views",
   },
   {
     id: "bali",
     name: "Bali",
     country: "Indonesia",
-    image:
-      "/images/bali.png",
-        imagePosition: "center 25%",
+    image: "/images/bali.png",
+    imagePosition: "center 25%",
     description: "Beaches, temples, and rice terraces in one island.",
+    highlights: [
+      "Sunrise trek up Mount Batur",
+      "Tegalalang rice terraces",
+      "Cliffside temples at Uluwatu",
+    ],
+    bestTimeToVisit: "April to October, during the dry season",
   },
   {
     id: "santorini",
     name: "Santorini",
     country: "Greece",
-    image:
-      "/images/santorini.png",
-      imagePosition: "center 40%",
+    image: "/images/santorini.png",
+    imagePosition: "center 40%",
     description: "Whitewashed cliffside villages over the Aegean Sea.",
+    highlights: [
+      "Caldera-edge walk from Oia to Fira",
+      "Sunset views over the volcano",
+      "Local wine tasting in Pyrgos",
+    ],
+    bestTimeToVisit: "Late April to June, or September, avoiding peak summer crowds",
   },
-    {
+  {
     id: "kathmandu",
     name: "Kathmandu",
     country: "Nepal",
-    image:
-      "https://images.unsplash.com/photo-1605640797058-58b7040a0e61?w=800&q=80",
-      imagePosition: "center 15%",
+    image: "https://images.unsplash.com/photo-1605640797058-58b7040a0e61?w=800&q=80",
+    imagePosition: "center 15%",
     description: "Ancient temples and vibrant streets in the Kathmandu Valley.",
+    highlights: [
+      "UNESCO World Heritage sites like Swayambhunath",
+      "Traditional Newari architecture in Patan",
+      "Vibrant street life in Thamel",
+    ],
+    bestTimeToVisit: "September to November and March to May",
   },
-    {
+  {
     id: "chitwan",
     name: "Chitwan",
     country: "Nepal",
-    image:
-      "https://images.unsplash.com/photo-1762209969249-ff0fd8e13a1b?w=800&q=80",
-      imagePosition: "center 60%",
+    image: "https://images.unsplash.com/photo-1762209969249-ff0fd8e13a1b?w=800&q=80",
+    imagePosition: "center 60%",
     description: "Jungle safaris and wildlife in a UNESCO World Heritage park.",
+    highlights: [
+      "Jeep safaris spotting rhinos and deer",
+      "Canoe rides along the Rapti River",
+      "Cultural shows by local Tharu communities",
+    ],
+    bestTimeToVisit: "October to March, before the summer heat and monsoon",
   },
   {
     id: "dubai",
     name: "Dubai",
     country: "United Arab Emirates",
-    image:
-      "https://images.unsplash.com/photo-1748373452031-ee1ae4eb624d?w=800&q=80",
-      imagePosition: "center 40%",
+    image: "https://images.unsplash.com/photo-1748373452031-ee1ae4eb624d?w=800&q=80",
+    imagePosition: "center 40%",
     description: "Futuristic skyline, Burj Khalifa, and desert adventures.",
+    highlights: [
+      "Observation deck views from Burj Khalifa",
+      "Desert safari with dune bashing",
+      "Shopping and fountain shows at Dubai Mall",
+    ],
+    bestTimeToVisit: "November to March, avoiding the summer heat",
   },
 ];
 
@@ -64,10 +93,19 @@ export const packages = [
     duration: "14 Days",
     price: 1450,
     badge: "Popular",
-    image:
-      "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80",
     description:
       "Trek through Sherpa villages, rhododendron forests, and high alpine trails to stand at the foot of the world's tallest mountain. A classic Himalayan adventure with experienced local guides at every step.",
+    highlights: [
+      "Close-up views of Everest, Lhotse, and Nuptse",
+      "Overnight stays in traditional Sherpa teahouses",
+      "Sunrise from Kala Patthar, the trek's iconic viewpoint",
+      "Cultural stop at Tengboche Monastery",
+    ],
+    difficulty: "Challenging",
+    bestSeason: "March–May and September–November",
+    startingPoint: "Kathmandu",
+    maxAltitude: "5,364 m (Kala Patthar)",
     itinerary: [
       { day: "Day 1", title: "Arrival in Kathmandu", description: "Airport pickup, trek briefing, and gear check." },
       { day: "Day 2–3", title: "Fly to Lukla, Trek to Namche Bazaar", description: "Scenic mountain flight followed by the first days on trail." },
@@ -87,10 +125,17 @@ export const packages = [
     duration: "7 Days",
     price: 890,
     badge: "Offer",
-    image:
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
     description:
       "A relaxed week across Bali's temples, rice terraces, and beaches — balancing culture, nature, and downtime by the water.",
+    highlights: [
+      "Sunrise trek up an active volcano",
+      "Traditional Kecak fire dance at Uluwatu",
+      "Free day for optional surfing or spa time",
+    ],
+    difficulty: "Easy",
+    bestSeason: "April–October (dry season)",
+    startingPoint: "Denpasar",
     itinerary: [
       { day: "Day 1", title: "Arrival in Denpasar", description: "Transfer to Ubud, evening at leisure." },
       { day: "Day 2", title: "Ubud Temples & Rice Terraces", description: "Visit Tegalalang rice terrace and a traditional water temple." },
@@ -110,10 +155,17 @@ export const packages = [
     duration: "5 Days",
     price: 1100,
     badge: null,
-    image:
-      "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80",
     description:
       "Whitewashed villages, cliffside caldera views, and some of the best sunsets in the world — a short, scenic escape built around slowing down.",
+    highlights: [
+      "Caldera-edge walking path from Oia to Fira",
+      "Private catamaran cruise with a swim stop",
+      "Wine tasting at a hilltop vineyard",
+    ],
+    difficulty: "Easy",
+    bestSeason: "Late April–June and September (shoulder season)",
+    startingPoint: "Santorini Airport",
     itinerary: [
       { day: "Day 1", title: "Arrival in Santorini", description: "Transfer to hotel in Oia, welcome dinner." },
       { day: "Day 2", title: "Oia & Caldera Walk", description: "Explore the village and walk the caldera-edge path to Fira." },
