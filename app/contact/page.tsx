@@ -1,15 +1,9 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
-import { packages } from "@/lib/dummy-data";
 
-function ContactContent() {
-  const searchParams = useSearchParams();
-  const packageId = searchParams.get("package");
-  const relatedPackage = packages.find((p) => p.id === packageId);
-
+export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -19,7 +13,7 @@ function ContactContent() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO (backend): POST to /api/contact, include packageId + reCAPTCHA token
+    // TODO (backend): POST to /api/contact, include reCAPTCHA token
     setSubmitted(true);
   }
 
@@ -35,7 +29,6 @@ function ContactContent() {
       </div>
 
       <div className="grid md:grid-cols-5 gap-10">
-        {/* Form */}
         <div className="md:col-span-3">
           {submitted ? (
             <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 text-center">
@@ -49,12 +42,6 @@ function ContactContent() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
-              {relatedPackage && (
-                <div className="rounded-xl bg-primary/5 border border-primary/10 px-4 py-3 text-sm text-zinc-700">
-                  Inquiring about: <span className="font-semibold">{relatedPackage.title}</span>
-                </div>
-              )}
-
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-zinc-700 mb-1.5">
@@ -111,7 +98,7 @@ function ContactContent() {
                   rows={5}
                   value={form.message}
                   onChange={handleChange}
-                  placeholder={relatedPackage ? `I'd like to know more about ${relatedPackage.title}...` : "How can we help?"}
+                  placeholder="How can we help?"
                   className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
                 />
               </div>
@@ -129,20 +116,19 @@ function ContactContent() {
           )}
         </div>
 
-        {/* Contact info */}
         <div className="md:col-span-2 space-y-4">
           <div className="rounded-2xl border border-black/5 bg-white p-6 flex items-start gap-3">
             <MapPin size={18} className="text-primary shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm text-zinc-900">Office</p>
-              <p className="text-sm text-zinc-600 mt-0.5">Lalitpur, Nepal</p>
+              <p className="text-sm text-zinc-600 mt-0.5">Kathmandu, Nepal</p>
             </div>
           </div>
           <div className="rounded-2xl border border-black/5 bg-white p-6 flex items-start gap-3">
             <Phone size={18} className="text-primary shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm text-zinc-900">Phone</p>
-              <p className="text-sm text-zinc-600 mt-0.5">+977 9792120873</p>
+              <p className="text-sm text-zinc-600 mt-0.5">+977 000-0000000</p>
             </div>
           </div>
           <div className="rounded-2xl border border-black/5 bg-white p-6 flex items-start gap-3">
@@ -155,13 +141,5 @@ function ContactContent() {
         </div>
       </div>
     </section>
-  );
-}
-
-export default function ContactPage() {
-  return (
-    <Suspense fallback={null}>
-      <ContactContent />
-    </Suspense>
   );
 }

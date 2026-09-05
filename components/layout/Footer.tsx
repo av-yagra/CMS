@@ -11,7 +11,7 @@ const quickLinks = [
 
 const supportLinks = [
   { href: "/contact", label: "Booking Support" },
-  { href: "/contact", label: "FAQs" },
+   { href: "/faq", label: "FAQs" },
   { href: "/contact", label: "Terms & Conditions" },
   { href: "/contact", label: "Privacy Policy" },
 ];

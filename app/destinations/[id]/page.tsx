@@ -53,6 +53,28 @@ export default async function DestinationDetailPage({ params }: Props) {
           {destination.description}
         </p>
       </section>
+      {destination.highlights && destination.highlights.length > 0 && (
+  <section className="max-w-3xl mx-auto px-6 pb-12">
+    <h2 className="font-heading text-xl font-bold text-zinc-900 mb-4 text-center">
+      Highlights
+    </h2>
+    <ul className="grid sm:grid-cols-2 gap-3">
+      {destination.highlights.map((item) => (
+        <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+          {item}
+        </li>
+      ))}
+    </ul>
+
+    {destination.bestTimeToVisit && (
+      <div className="mt-6 rounded-xl bg-primary/5 border border-primary/10 px-5 py-4 text-sm text-zinc-700 text-center">
+        <span className="font-semibold text-primary">Best time to visit:</span>{" "}
+        {destination.bestTimeToVisit}
+      </div>
+    )}
+  </section>
+)}
 
       {/* Related packages */}
       {relatedPackages.length > 0 && (

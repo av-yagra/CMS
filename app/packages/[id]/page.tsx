@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Clock, MapPin, Check, X } from "lucide-react";
 import { packages } from "@/lib/dummy-data";
 import PackageCard from "@/components/shared/PackageCard";
+import QuickFacts from "@/components/shared/QuickFacts";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -67,13 +68,36 @@ export default async function PackageDetailPage({ params }: Props) {
               <span className="text-sm text-zinc-500 font-normal"> / person</span>
             </p>
             <Link
-              href={`/contact?package=${pkg.id}`}
+              href={`/book?package=${pkg.id}`}
               className="inline-block mt-3 bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-full transition-colors"
             >
               Book This Package
             </Link>
           </div>
         </div>
+
+        <QuickFacts
+  difficulty={pkg.difficulty}
+  bestSeason={pkg.bestSeason}
+  startingPoint={pkg.startingPoint}
+  maxAltitude={pkg.maxAltitude}
+/>
+
+{pkg.highlights && pkg.highlights.length > 0 && (
+  <section className="mt-10 mb-2">
+    <h2 className="font-heading text-2xl font-bold text-zinc-900 mb-4">
+      Trip Highlights
+    </h2>
+    <ul className="grid sm:grid-cols-2 gap-3">
+      {pkg.highlights.map((item) => (
+        <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+          {item}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
 
         {/* Itinerary */}
         <section className="mb-12">
