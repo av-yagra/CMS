@@ -1,8 +1,11 @@
 import nodemailer from 'nodemailer';
 
+const port = Number(process.env.EMAIL_SERVER_PORT) || 587;
+
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT) || 587,
+    port: port,
+    secure: port === 465, // true for 465, false for other ports (like 587 for STARTTLS)
     auth: {
         user: process.env.EMAIL_SERVER_USER,
         pass: process.env.EMAIL_SERVER_PASSWORD,
@@ -10,15 +13,27 @@ const transporter = nodemailer.createTransport({
 });
 
 export const sendOTP = async (to: string, otp: string) => {
-    // Only attempt to send if email host is configured
+    // Safely log configuration presence (NEVER the actual values)
+    console.log('[EMAIL DIAGNOSTICS] Configuration Check:');
+    console.log('- EMAIL_SERVER_HOST configured:', !!process.env.EMAIL_SERVER_HOST);
+    console.log('- EMAIL_SERVER_PORT configured:', !!process.env.EMAIL_SERVER_PORT);
+    console.log('- EMAIL_SERVER_USER configured:', !!process.env.EMAIL_SERVER_USER);
+    console.log('- EMAIL_SERVER_PASSWORD configured:', !!process.env.EMAIL_SERVER_PASSWORD);
+    console.log('- EMAIL_FROM configured:', !!process.env.EMAIL_FROM);
+
+    // Unconditionally require email host so it throws a 500 when missing,
+    // rolling back user creation, instead of falsely claiming success!
     if (!process.env.EMAIL_SERVER_HOST) {
-        if (process.env.NODE_ENV === 'production') {
-            throw new Error('SMTP credentials are not configured in production. Cannot send OTP.');
-        }
-        // Never log the actual OTP - security risk even in development
-        console.warn(`[DEV] EMAIL_SERVER_HOST not configured. Email to ${to} skipped. Check server logs if you need the OTP for testing.`);
-        // In development, you could alternatively store OTPs in a dev-only database table for testing
-        return;
+        throw new Error('SMTP credentials are not configured. Cannot send OTP.');
+    }
+
+    try {
+        console.log('[EMAIL DIAGNOSTICS] Verifying SMTP connection...');
+        await transporter.verify();
+        console.log('[EMAIL DIAGNOSTICS] SMTP connection verified successfully.');
+    } catch (verifyError) {
+        console.error('[EMAIL DIAGNOSTICS] SMTP verification failed. Check credentials/App Password:', verifyError);
+        throw new Error('SMTP verification failed. Cannot send email.');
     }
 
     const mailOptions = {
