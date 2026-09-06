@@ -11,11 +11,30 @@ import HeroSlideshow from "@/components/shared/HeroSlideshow";
 import HeroSearch from "@/components/shared/HeroSearch";
 
 const heroImages = [
-  { id: "pokhara", image: destinations[0].image, imagePosition: destinations[0].imagePosition, name: destinations[0].name },
-  { id: "everest-base-camp", image: packages[0].image, name: packages[0].title },
-  { id: "santorini", image: destinations[2].image, imagePosition: destinations[2].imagePosition, name: destinations[2].name },
+  {
+    id: "pokhara",
+    image: destinations[0].image,
+    imagePosition: destinations[0].imagePosition,
+    name: destinations[0].name,
+  },
+  {
+    id: "everest-base-camp",
+    image: packages[0].image,
+    name: packages[0].title,
+  },
+  {
+    id: "santorini",
+    image: destinations[2].image,
+    imagePosition: destinations[2].imagePosition,
+    name: destinations[2].name,
+  },
   { id: "bali-getaway", image: packages[1].image, name: packages[1].title },
-  { id: "dubai", image: destinations[5].image, imagePosition: destinations[5].imagePosition, name: destinations[5].name },
+  {
+    id: "dubai",
+    image: destinations[5].image,
+    imagePosition: destinations[5].imagePosition,
+    name: destinations[5].name,
+  },
 ];
 
 const whyChooseUs = [
@@ -82,7 +101,8 @@ export default function Home() {
               Discover Your Next Adventure
             </h1>
             <p className="mt-5 text-lg text-zinc-600 max-w-md mx-auto md:mx-0">
-              Handpicked destinations and tour packages, wherever you want to go.
+              Handpicked destinations and tour packages, wherever you want to
+              go.
             </p>
 
             <div className="mt-6 relative z-20 md:w-[135%]">
@@ -113,15 +133,15 @@ export default function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {destinations.map((d) => (
+          {destinations.slice(0, 6).map((d) => (
             <DestinationCard key={d.id} {...d} />
           ))}
         </div>
       </section>
 
       {/* Featured Packages */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="flex items-end justify-between mb-8">
+      <section className="max-w-6xl mx-auto py-16">
+        <div className="max-w-6xl mx-auto px-6 flex items-end justify-between mb-8">
           <h2 className="font-heading text-2xl md:text-3xl font-bold text-zinc-900">
             Popular Packages
           </h2>
@@ -132,8 +152,21 @@ export default function Home() {
             View all
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {packages.map((p) => (
+
+        {/* Mobile only: manual swipeable carousel, next card peeks in on the right */}
+        <div className="sm:hidden">
+          <div className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-2 px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {packages.slice(0, 6).map((p) => (
+              <div key={p.id} className="shrink-0 w-[85%] snap-start">
+                <PackageCard {...p} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tablet & desktop: static grid, same pattern as Featured Destinations */}
+        <div className="hidden sm:grid max-w-6xl mx-auto px-6 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {packages.slice(0, 6).map((p) => (
             <PackageCard key={p.id} {...p} />
           ))}
         </div>

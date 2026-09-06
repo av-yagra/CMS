@@ -12,10 +12,22 @@ type Props = {
   duration: string;
   price: number;
   image: string;
+  summary?: string;
   badge?: string | null;
+  showViewDetail?: boolean;
 };
 
-export default function PackageCard({ id, title, destination, duration, price, image, badge }: Props) {
+export default function PackageCard({
+  id,
+  title,
+  destination,
+  duration,
+  price,
+  image,
+  summary,
+  badge,
+  showViewDetail = false,
+}: Props) {
   const { isWishlisted, toggleWishlist } = useWishlist();
   const saved = isWishlisted(id);
 
@@ -54,14 +66,29 @@ export default function PackageCard({ id, title, destination, duration, price, i
         </button>
       </div>
       <div className="p-4">
-        <p className="font-heading font-semibold text-lg text-zinc-900">{title}</p>
-        <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-1">
-          <Clock size={14} />
-          <span>{duration}</span>
+        <div className="flex items-start justify-between gap-2">
+          <p className="font-heading font-semibold text-lg text-zinc-900 flex-1">
+            {title}
+          </p>
+          <div className="flex items-center gap-1 text-xs text-zinc-500 shrink-0 pt-1">
+            <Clock size={13} />
+            <span>{duration}</span>
+          </div>
         </div>
+
+        {summary && (
+          <p className="text-sm text-zinc-500 mt-1.5 line-clamp-1">{summary}</p>
+        )}
+
         <p className="mt-3 font-semibold text-primary">
           ${price} <span className="text-sm text-zinc-500 font-normal">/ person</span>
         </p>
+
+        {showViewDetail && (
+          <span className="mt-3 block text-center text-sm font-semibold text-white bg-primary group-hover:bg-primary-dark rounded-full py-2 transition-colors">
+            View Detail
+          </span>
+        )}
       </div>
     </Link>
   );

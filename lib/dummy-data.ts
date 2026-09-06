@@ -83,6 +83,34 @@ export const destinations = [
     ],
     bestTimeToVisit: "November to March, avoiding the summer heat",
   },
+    {
+    id: "muktinath",
+    name: "Muktinath",
+    country: "Nepal",
+    image: "/images/muktinath.jpg",
+    imagePosition: "center 40%",
+    description: "A sacred Himalayan temple town at 3,760 meters, holy to both Hindus and Buddhists.",
+    highlights: [
+      "Muktinath Temple, sacred to two religions",
+      "Dramatic drive through the Kali Gandaki gorge",
+      "Views of the Annapurna and Dhaulagiri ranges",
+    ],
+    bestTimeToVisit: "March to June and September to November",
+  },
+  {
+    id: "agra",
+    name: "Agra",
+    country: "India",
+    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80",
+    imagePosition: "center 45%",
+    description: "Home to the Taj Mahal, one of the world's most iconic monuments.",
+    highlights: [
+      "Sunrise views of the Taj Mahal",
+      "Agra Fort, a UNESCO World Heritage Site",
+      "Mughal-era architecture throughout the old city",
+    ],
+    bestTimeToVisit: "October to March, avoiding the summer heat",
+  },
 ];
 
 export const packages = [
@@ -94,6 +122,7 @@ export const packages = [
     price: 1450,
     badge: "Popular",
     image: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80",
+    summary: "Stand at Everest's doorstep after two weeks through Sherpa country.",
     description:
       "Trek through Sherpa villages, rhododendron forests, and high alpine trails to stand at the foot of the world's tallest mountain. A classic Himalayan adventure with experienced local guides at every step.",
     highlights: [
@@ -126,6 +155,7 @@ export const packages = [
     price: 890,
     badge: "Offer",
     image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+    summary: "Temples, volcanoes, and beach time across a relaxed island week.",
     description:
       "A relaxed week across Bali's temples, rice terraces, and beaches — balancing culture, nature, and downtime by the water.",
     highlights: [
@@ -156,6 +186,8 @@ export const packages = [
     price: 1100,
     badge: null,
     image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80",
+    summary: "Caldera views and sunsets over the Aegean in five easy days.",
+
     description:
       "Whitewashed villages, cliffside caldera views, and some of the best sunsets in the world — a short, scenic escape built around slowing down.",
     highlights: [
@@ -175,6 +207,95 @@ export const packages = [
     ],
     includes: ["Airport transfers", "4 nights hotel", "Daily breakfast", "Catamaran cruise", "Wine tasting tour"],
     excludes: ["International flights", "Travel insurance", "Lunch & dinner (except Day 1)"],
+  },
+    {
+    id: "muktinath-jeep-tour",
+    title: "Muktinath Jeep Tour",
+    destination: "Nepal",
+    duration: "3 Days",
+    price: 320,
+    badge: null,
+    image: "https://images.unsplash.com/photo-1540961286473-8ad1368dc1bd?w=800&q=80",
+    summary: "A gorge-side drive to Nepal's holiest mountain temple.",
+    description:
+      "A scenic jeep journey from Pokhara through the dramatic Kali Gandaki gorge to the sacred temple of Muktinath, one of the holiest sites for both Hindus and Buddhists.",
+    highlights: [
+      "Drive through the world's deepest gorge, Kali Gandaki",
+      "Visit the sacred Muktinath Temple at 3,760m",
+      "Stop at the walled village of Kagbeni",
+      "Panoramic views of the Annapurna and Dhaulagiri ranges",
+    ],
+    difficulty: "Easy",
+    bestSeason: "March–June and September–November",
+    startingPoint: "Pokhara",
+    maxAltitude: "3,760 m (Muktinath)",
+    itinerary: [
+      { day: "Day 1", title: "Pokhara to Jomsom to Muktinath", description: "Early jeep drive along the Kali Gandaki gorge, arriving in Muktinath by afternoon for temple visit." },
+      { day: "Day 2", title: "Muktinath to Kagbeni to Jomsom", description: "Morning at the temple, then drive back through Kagbeni's old town to Jomsom." },
+      { day: "Day 3", title: "Jomsom to Pokhara", description: "Return drive to Pokhara, arriving by evening." },
+    ],
+    includes: ["Private jeep transport", "Driver & guide", "2 nights accommodation", "Temple entrance fees"],
+    excludes: ["Meals", "Personal expenses", "Travel insurance"],
+  },
+  {
+    id: "pokhara-day-tour",
+    title: "Full Day Pokhara Tour",
+    destination: "Nepal",
+    duration: "1 Day",
+    price: 45,
+    badge: "New",
+    image: "/images/pokhara.png",
+    imagePosition: "center 35%",
+    summary: "Boating, waterfalls, and viewpoints — all in a single easy day.",
+    description:
+      "A relaxed full-day tour covering Pokhara's best-known sights — lakeside boating, waterfalls, caves, and panoramic viewpoints — all in a single day.",
+    highlights: [
+      "Boating on Phewa Lake",
+      "Davis Falls and Gupteshwor Cave",
+      "World Peace Pagoda viewpoint",
+      "Old Bazaar and lakeside walk",
+    ],
+    difficulty: "Easy",
+    bestSeason: "Year-round, clearest views October–April",
+    startingPoint: "Pokhara",
+    itinerary: [
+      { day: "Morning", title: "Phewa Lake & Old Bazaar", description: "Boating on the lake followed by a walk through Pokhara's old bazaar." },
+      { day: "Afternoon", title: "Davis Falls & Gupteshwor Cave", description: "Visit the waterfall and the cave system just below it." },
+      { day: "Evening", title: "World Peace Pagoda", description: "Sunset views over Pokhara and the Annapurna range from the pagoda." },
+    ],
+    includes: ["Private vehicle", "Local guide", "Entrance fees", "Boat ride"],
+    excludes: ["Meals", "Personal expenses"],
+  },
+  {
+    id: "golden-triangle-tour",
+    title: "Golden Triangle Tour",
+    destination: "India",
+    duration: "6 Days",
+    price: 780,
+    badge: "New",
+    image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80",
+    summary: "Delhi, Agra, and Jaipur's icons in one classic Indian route.",
+    description:
+      "India's classic route through Delhi, Agra, and Jaipur — Mughal monuments, the Taj Mahal at sunrise, and the pink city's forts and palaces.",
+    highlights: [
+      "Sunrise visit to the Taj Mahal",
+      "Amber Fort and City Palace in Jaipur",
+      "Old Delhi street food and Red Fort",
+      "Local guide throughout all three cities",
+    ],
+    difficulty: "Easy",
+    bestSeason: "October–March, avoiding summer heat",
+    startingPoint: "Delhi",
+    itinerary: [
+      { day: "Day 1", title: "Arrival in Delhi", description: "Airport pickup and evening at leisure." },
+      { day: "Day 2", title: "Old & New Delhi", description: "Red Fort, Jama Masjid, India Gate, and Humayun's Tomb." },
+      { day: "Day 3", title: "Drive to Agra", description: "Travel to Agra, visit Agra Fort in the afternoon." },
+      { day: "Day 4", title: "Taj Mahal Sunrise & Jaipur", description: "Sunrise at the Taj Mahal, then drive to Jaipur." },
+      { day: "Day 5", title: "Jaipur Sightseeing", description: "Amber Fort, City Palace, and Hawa Mahal." },
+      { day: "Day 6", title: "Departure", description: "Drive back to Delhi for departure." },
+    ],
+    includes: ["Private A/C vehicle", "Local guide", "5 nights hotel", "Daily breakfast", "Monument entrance fees"],
+    excludes: ["International flights", "Travel insurance", "Lunch & dinner"],
   },
 ];
 

@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import PackageCard from "@/components/shared/PackageCard";
 import { packages } from "@/lib/dummy-data";
 
@@ -32,14 +32,23 @@ function PackagesContent() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by package or destination..."
-          className="w-full pl-11 pr-4 py-3 rounded-full border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          className="w-full pl-11 pr-11 py-3 rounded-full border border-black/10 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
+        {query.length > 0 && (
+          <button
+            onClick={() => setQuery("")}
+            aria-label="Clear search"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
 
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filtered.map((p) => (
-            <PackageCard key={p.id} {...p} />
+            <PackageCard key={p.id} {...p} showViewDetail />
           ))}
         </div>
       ) : (
