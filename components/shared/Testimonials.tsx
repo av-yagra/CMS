@@ -36,11 +36,11 @@ export default function Testimonials() {
           </div>
         </div>
 
-        <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 scrollbar-none [&::-webkit-scrollbar]:hidden">
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="snap-start shrink-0 w-[300px] rounded-2xl bg-white/5 border border-white/10 p-6"
+              className="snap-start shrink-0 w-75 rounded-2xl bg-white/5 border border-white/10 p-6"
             >
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
