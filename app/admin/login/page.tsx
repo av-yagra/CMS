@@ -1,16 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { signIn, getSession } from "next-auth/react";
+import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Eye, EyeOff } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in as admin
+  if (session?.user?.role === "admin") {
+    router.push("/admin/dashboard");
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -39,10 +45,11 @@ export default function AdminLoginPage() {
 
     if (session?.user?.role !== "admin") {
       setError("This account doesn't have admin access.");
-      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => { });
       setLoading(false);
       return;
     }
+
 
     router.push("/admin/dashboard");
     router.refresh();

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { hashPassword } from '@/lib/password';
+import crypto from 'crypto';
+import { sendOTP } from '@/lib/email';
 
 export async function POST(req: Request) {
     try {
@@ -30,7 +32,6 @@ export async function POST(req: Request) {
 
         // 3. Database connection
         const client = await clientPromise;
-        // We use the default database attached to the connection (consistent with NextAuth's MongoDB adapter)
         const db = client.db();
         const usersCollection = db.collection('users');
 
@@ -43,7 +44,19 @@ export async function POST(req: Request) {
         // 5. Hash the password
         const passwordHash = await hashPassword(password);
 
-        // 6. Create the user document securely
+        // 6. Generate OTP
+        const otp = crypto.randomInt(100000, 999999).toString();
+        
+        // Ensure AUTH_SECRET is present - fail securely if missing
+        const secret = process.env.AUTH_SECRET;
+        if (!secret) {
+            throw new Error('AUTH_SECRET is not configured. Cannot generate secure OTP.');
+        }
+        
+        const otpHash = crypto.createHmac('sha256', secret).update(otp).digest('hex');
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+        // 7. Create the user document securely
         const now = new Date();
         const newUser = {
             name: normalizedName,
@@ -51,17 +64,34 @@ export async function POST(req: Request) {
             passwordHash,
             role: 'user', // strictly enforced by backend
             image: null,
+            emailVerified: false,
+            emailVerificationCodeHash: otpHash,
+            emailVerificationExpires: otpExpires,
+            emailVerificationAttempts: 0,
             createdAt: now,
             updatedAt: now,
         };
 
-        // 7. Insert the user into MongoDB
-        await usersCollection.insertOne(newUser);
+        // 8. Insert the user into MongoDB
+        const insertResult = await usersCollection.insertOne(newUser);
 
-        // 8. Return successful response (Excluding the hash!)
+        // 9. Send OTP to the user
+        try {
+            await sendOTP(normalizedEmail, otp);
+        } catch (emailError) {
+            // Rollback user creation if we cannot securely deliver the OTP
+            await usersCollection.deleteOne({ _id: insertResult.insertedId });
+            console.error('Email sending failed, rolled back user creation:', emailError);
+            return NextResponse.json(
+                { message: 'Failed to send verification email. Please try again later.' },
+                { status: 500 }
+            );
+        }
+
+        // 10. Return successful response (Excluding the hash!)
         return NextResponse.json(
             {
-                message: 'User registered successfully',
+                message: 'User registered successfully. Please verify your email.',
                 user: {
                     name: newUser.name,
                     email: newUser.email,

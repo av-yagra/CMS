@@ -1,19 +1,26 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { CalendarDays, CheckCircle2 } from "lucide-react";
 import { packages } from "@/lib/dummy-data";
 
 function BookForm() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const packageId = searchParams.get("package");
   const preselected = packages.find((p) => p.id === packageId);
 
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
   const [form, setForm] = useState({
     packageId: preselected?.id ?? "",
-    name: "",
-    email: "",
     phone: "",
     nationality: "",
     travelers: 1,
@@ -21,6 +28,8 @@ function BookForm() {
     details: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -32,11 +41,38 @@ function BookForm() {
     }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO (backend): POST to /api/bookings — creates booking as "Pending",
-    // then continues into the eSewa payment flow once that's built.
-    setSubmitted(true);
+    setError("");
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          packageId: form.packageId,
+          phone: form.phone,
+          nationality: form.nationality,
+          travelers: form.travelers,
+          expectedDate: form.expectedDate,
+          details: form.details,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "An error occurred while submitting your booking.");
+        return;
+      }
+
+      setSubmitted(true);
+    } catch (_err) {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const selectedPackage = packages.find((p) => p.id === form.packageId);
@@ -69,6 +105,11 @@ function BookForm() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-2.5">
+              {error}
+            </p>
+          )}
           <div>
             <label htmlFor="packageId" className="block text-sm font-medium text-zinc-700 mb-1.5">
               Trip Package
@@ -101,10 +142,9 @@ function BookForm() {
                 id="name"
                 name="name"
                 type="text"
-                required
-                value={form.name}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                disabled
+                value={session?.user?.name || "User"}
+                className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 bg-gray-100 cursor-not-allowed"
               />
             </div>
             <div>
@@ -131,10 +171,9 @@ function BookForm() {
                 id="email"
                 name="email"
                 type="email"
-                required
-                value={form.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                disabled
+                value={session?.user?.email || ""}
+                className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 bg-gray-100 cursor-not-allowed"
               />
             </div>
             <div>
@@ -202,9 +241,10 @@ function BookForm() {
 
           <button
             type="submit"
-            className="w-full bg-accent hover:bg-accent-dark text-white font-semibold py-3 rounded-full transition-colors"
+            disabled={loading}
+            className="w-full bg-accent hover:bg-accent-dark disabled:opacity-60 text-white font-semibold py-3 rounded-full transition-colors"
           >
-            Request Quote
+            {loading ? "Submitting..." : "Request Quote"}
           </button>
         </form>
       )}
