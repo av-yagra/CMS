@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import AdminTopbar from "@/components/admin/AdminTopbar";
 
 export default async function AdminProtectedLayout({
   children,
@@ -18,9 +19,12 @@ export default async function AdminProtectedLayout({
   }
 
   return (
-    <div className="min-h-full bg-zinc-50 flex">
+    <div className="h-screen flex bg-zinc-50">
       <AdminSidebar />
-      <main className="flex-1 p-6 md:p-8">{children}</main>
+      <div className="flex-1 flex flex-col min-w-0">
+        <AdminTopbar />
+        <main className="flex-1 overflow-y-auto p-6 md:p-8">{children}</main>
+      </div>
     </div>
   );
 }
