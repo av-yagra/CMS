@@ -27,8 +27,8 @@ export default function AdminSidebar() {
 
   return (
     <aside className="hidden md:flex md:flex-col w-64 shrink-0 bg-white border-r border-black/5 h-screen sticky top-0 p-6">
-      <Link href="/admin/dashboard" className="font-heading font-bold text-xl text-primary mb-8">
-        Paila Admin
+      <Link href="/" className="font-heading font-bold text-xl text-primary mb-8">
+        Paila 
       </Link>
 
       <nav className="flex-1 space-y-6">
