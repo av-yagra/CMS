@@ -85,31 +85,17 @@ export default function Navbar() {
             )}
           </Link>
 
-          {status === "unauthenticated" && (
-            <div className="hidden sm:flex items-center gap-3">
-              <Link
-                href="/login"
-                className="text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/signup"
-                className="text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 px-4 py-2 rounded-full transition-colors"
-              >
-                Sign up
-              </Link>
-            </div>
+          {status === "authenticated" && session.user?.role === "admin" && (
+            <Link
+              href="/admin/dashboard"
+              aria-label="Admin Dashboard"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-primary/10 text-primary font-heading font-semibold text-sm hover:bg-primary/20 transition-colors"
+            >
+              {session.user?.name?.charAt(0).toUpperCase() ?? "A"}
+            </Link>
           )}
 
-          <Link
-            href="/packages"
-            className="hidden sm:inline-block bg-accent hover:bg-accent-dark text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-          >
-            Book Now
-          </Link>
-
-          {status === "authenticated" && (
+          {status === "authenticated" && session.user?.role !== "admin" && (
             <div className="relative hidden sm:block" ref={profileRef}>
               <button
                 onClick={() => setProfileOpen((prev) => !prev)}
@@ -176,12 +162,22 @@ export default function Navbar() {
           </Link>
 
           <div className="border-t border-black/5 pt-4">
-            {status === "authenticated" ? (
+            {status === "authenticated" && session.user?.role === "admin" && (
+              <Link
+                href="/admin/dashboard"
+                onClick={() => setIsOpen(false)}
+                className="text-sm font-medium text-primary"
+              >
+                Admin Dashboard
+              </Link>
+            )}
+
+            {status === "authenticated" && session.user?.role !== "admin" && (
               <div>
                 <p className="text-sm font-semibold text-zinc-900">
                   {session.user?.name}
                 </p>
-                <p className="text-xs text-zinc-500 break-all mt-0.5">
+                <p className="text-xs text-zinc-500 mt-0.5">
                   {session.user?.email}
                 </p>
                 <button
@@ -194,23 +190,6 @@ export default function Navbar() {
                   <LogOut size={15} />
                   Log Out
                 </button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-zinc-700"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-medium text-primary"
-                >
-                  Sign up
-                </Link>
               </div>
             )}
           </div>

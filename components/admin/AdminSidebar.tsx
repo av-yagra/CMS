@@ -16,7 +16,7 @@ export default function AdminSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex md:flex-col w-64 shrink-0 bg-white border-r border-black/5 min-h-screen p-6">
+    <aside className="hidden md:flex md:flex-col w-64 shrink-0 bg-white border-r border-black/5 min-h-full p-6">
       <Link href="/admin/dashboard" className="font-heading font-bold text-xl text-primary mb-10">
         Paila Admin
       </Link>
