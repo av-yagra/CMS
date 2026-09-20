@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, Eye, EyeOff } from "lucide-react";
@@ -14,9 +15,11 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
 
   // Redirect if already logged in as admin
+useEffect(() => {
   if (session?.user?.role === "admin") {
     router.push("/admin/dashboard");
   }
+}, [session, router]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
