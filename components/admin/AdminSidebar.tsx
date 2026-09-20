@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarCheck, MapPin, Package, Tags } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, MapPin, Package, Tags, FileText } from "lucide-react";
 
 const groups = [
   {
@@ -10,6 +10,7 @@ const groups = [
     links: [
       { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+      { href: "/admin/site-content", label: "Site Content", icon: FileText },
     ],
   },
   {
