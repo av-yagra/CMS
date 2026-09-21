@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Star } from "lucide-react";
 import { useSiteContent } from "@/hooks/useSiteContent";
 
@@ -7,6 +8,16 @@ export default function Testimonials() {
   const { testimonials } = useSiteContent();
   const avgRating =
     testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Some browsers auto-restore a scrollable element's position on refresh.
+    // Force it back to the start every time this component mounts.
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+    }
+  }, []);
 
   return (
     <section className="bg-surface-dark text-white">
@@ -21,14 +32,20 @@ export default function Testimonials() {
             </h2>
           </div>
           <div className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4 w-fit">
-            <span className="font-heading text-3xl font-bold">{avgRating.toFixed(1)}</span>
+            <span className="font-heading text-3xl font-bold">
+              {avgRating.toFixed(1)}
+            </span>
             <div>
               <div className="flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
                     size={14}
-                    className={i < Math.round(avgRating) ? "fill-accent text-accent" : "text-white/20"}
+                    className={
+                      i < Math.round(avgRating)
+                        ? "fill-accent text-accent"
+                        : "text-white/20"
+                    }
                   />
                 ))}
               </div>
@@ -39,23 +56,30 @@ export default function Testimonials() {
           </div>
         </div>
 
-        <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6 scrollbar-none [&::-webkit-scrollbar]:hidden">
+        <div
+          ref={scrollRef}
+          className="testimonial-scroll flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory -mx-6 px-6"
+        >
           {testimonials.map((t) => (
             <div
               key={t.id}
-              className="snap-start shrink-0 w-75 rounded-2xl bg-white/5 border border-white/10 p-6"
+              className="snap-start shrink-0 w-75 rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col"
             >
               <div className="flex gap-1 mb-4">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
                     size={14}
-                    className={i < t.rating ? "fill-accent text-accent" : "text-white/20"}
+                    className={
+                      i < t.rating ? "fill-accent text-accent" : "text-white/20"
+                    }
                   />
                 ))}
               </div>
-              <p className="text-sm text-white/80 leading-relaxed">&quot;{t.quote}&quot;</p>
-              <div className="mt-5 flex items-center gap-3">
+              <p className="text-sm text-white/80 leading-relaxed">
+                &quot;{t.quote}&quot;
+              </p>
+              <div className="mt-auto pt-5 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-full bg-accent/20 text-accent flex items-center justify-center font-heading font-semibold text-sm">
                   {t.name.charAt(0)}
                 </div>
