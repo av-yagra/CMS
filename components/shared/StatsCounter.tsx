@@ -1,6 +1,10 @@
-import { stats } from "@/lib/dummy-data";
+"use client";
+
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export default function StatsCounter() {
+  const { stats } = useSiteContent();
+
   return (
     <section className="bg-primary">
       <div className="max-w-6xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">

@@ -1,7 +1,10 @@
+"use client";
+
 import { Star } from "lucide-react";
-import { testimonials } from "@/lib/dummy-data";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export default function Testimonials() {
+  const { testimonials } = useSiteContent();
   const avgRating =
     testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length;
 

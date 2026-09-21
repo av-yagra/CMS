@@ -1,9 +1,11 @@
 "use client";
 
+import { useSiteContent } from "@/hooks/useSiteContent";
 import { useState } from "react";
 import { Mail, Phone, MapPin, CheckCircle2 } from "lucide-react";
 
 export default function ContactPage() {
+  const content = useSiteContent();
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
@@ -121,21 +123,21 @@ export default function ContactPage() {
             <MapPin size={18} className="text-primary shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm text-zinc-900">Office</p>
-              <p className="text-sm text-zinc-600 mt-0.5">Kathmandu, Nepal</p>
+              <p className="text-sm text-zinc-600 mt-0.5">{content.contact.address}</p>
             </div>
           </div>
           <div className="rounded-2xl border border-black/5 bg-white p-6 flex items-start gap-3">
             <Phone size={18} className="text-primary shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm text-zinc-900">Phone</p>
-              <p className="text-sm text-zinc-600 mt-0.5">+977 000-0000000</p>
+              <p className="text-sm text-zinc-600 mt-0.5">{content.contact.phone}</p>
             </div>
           </div>
           <div className="rounded-2xl border border-black/5 bg-white p-6 flex items-start gap-3">
             <Mail size={18} className="text-primary shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm text-zinc-900">Email</p>
-              <p className="text-sm text-zinc-600 mt-0.5">hello@paila.com</p>
+              <p className="text-sm text-zinc-600 mt-0.5">{content.contact.email}</p>
             </div>
           </div>
         </div>
