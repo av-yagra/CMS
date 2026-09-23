@@ -1,14 +1,50 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import DestinationCard from "@/components/shared/DestinationCard";
-import { destinations } from "@/lib/dummy-data";
+
+type Destination = {
+  id: string;
+  name: string;
+  country: string;
+  image: string;
+  imagePosition?: string;
+  description: string;
+  highlights: string[];
+  bestTimeToVisit: string;
+};
 
 function DestinationsContent() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
+  const [destinations, setDestinations] = useState<Destination[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDestinations() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch("/api/destinations");
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setError(data.message ?? "Failed to load destinations.");
+          return;
+        }
+        const data = await res.json();
+        setDestinations(data.destinations ?? []);
+      } catch {
+        setError("Unable to reach the server. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDestinations();
+  }, []);
 
   const filtered = destinations.filter((d) =>
     `${d.name} ${d.country}`.toLowerCase().includes(query.toLowerCase())
@@ -45,12 +81,18 @@ function DestinationsContent() {
         )}
       </div>
 
-      {filtered.length > 0 ? (
+      {loading ? (
+        <p className="text-center text-zinc-400 py-16">Loading destinations…</p>
+      ) : error ? (
+        <p className="text-center text-red-500 py-16">{error}</p>
+      ) : filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filtered.map((d) => (
             <DestinationCard key={d.id} {...d} />
           ))}
         </div>
+      ) : destinations.length === 0 ? (
+        <p className="text-center text-zinc-500">No destinations are available yet.</p>
       ) : (
         <p className="text-center text-zinc-500">
           No destinations match &quot;{query}&quot;. Try a different search.
