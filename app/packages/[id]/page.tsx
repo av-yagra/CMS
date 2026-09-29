@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock, MapPin, Check, X } from "lucide-react";
-import { packages } from "@/lib/dummy-data";
+import clientPromise from "@/lib/mongodb";
 import PackageCard from "@/components/shared/PackageCard";
 import QuickFacts from "@/components/shared/QuickFacts";
+import { AdminPackage } from "@/types/package";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -12,15 +13,21 @@ type Props = {
 
 export default async function PackageDetailPage({ params }: Props) {
   const { id } = await params;
-  const pkg = packages.find((p) => p.id === id);
+
+  const client = await clientPromise;
+  const db = client.db();
+  const pkg = await db.collection<AdminPackage>("packages").findOne({ id });
 
   if (!pkg) {
     notFound();
   }
 
-  const relatedPackages = packages.filter(
-    (p) => p.destination.toLowerCase() === pkg.destination.toLowerCase() && p.id !== pkg.id,
-  );
+  const relatedCursor = db.collection<AdminPackage>("packages").find({
+    destination: { $regex: new RegExp(`^${pkg.destination}$`, "i") },
+    id: { $ne: pkg.id }
+  });
+  const rawRelatedInfo = await relatedCursor.toArray();
+  const relatedPackages = rawRelatedInfo.map(({ _id, ...rest }) => rest);
 
   return (
     <>
@@ -77,27 +84,27 @@ export default async function PackageDetailPage({ params }: Props) {
         </div>
 
         <QuickFacts
-  difficulty={pkg.difficulty}
-  bestSeason={pkg.bestSeason}
-  startingPoint={pkg.startingPoint}
-  maxAltitude={pkg.maxAltitude}
-/>
+          difficulty={pkg.difficulty}
+          bestSeason={pkg.bestSeason}
+          startingPoint={pkg.startingPoint}
+          maxAltitude={pkg.maxAltitude}
+        />
 
-{pkg.highlights && pkg.highlights.length > 0 && (
-  <section className="mt-10 mb-2">
-    <h2 className="font-heading text-2xl font-bold text-zinc-900 mb-4">
-      Trip Highlights
-    </h2>
-    <ul className="grid sm:grid-cols-2 gap-3">
-      {pkg.highlights.map((item) => (
-        <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
-          {item}
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
+        {pkg.highlights && pkg.highlights.length > 0 && (
+          <section className="mt-10 mb-2">
+            <h2 className="font-heading text-2xl font-bold text-zinc-900 mb-4">
+              Trip Highlights
+            </h2>
+            <ul className="grid sm:grid-cols-2 gap-3">
+              {pkg.highlights.map((item) => (
+                <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Itinerary */}
         <section className="mb-12">

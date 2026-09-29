@@ -1,8 +1,21 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
-import { subscribe, getSnapshot, getServerSnapshot } from "@/lib/siteContentStore";
+import { useState, useEffect } from "react";
+import { SiteContent, defaultContent } from "@/lib/siteContentStore";
 
 export function useSiteContent() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [content, setContent] = useState<SiteContent>(defaultContent);
+
+  useEffect(() => {
+    fetch('/api/site-content')
+      .then(res => res.json())
+      .then(data => {
+        if (data.content) {
+          setContent(data.content);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  return content;
 }

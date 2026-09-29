@@ -4,20 +4,27 @@ import { Suspense, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { CalendarDays, CheckCircle2 } from "lucide-react";
-import { packages } from "@/lib/dummy-data";
+import { AdminPackage } from "@/types/package";
 
 function BookForm() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const packageId = searchParams.get("package");
-  const preselected = packages.find((p) => p.id === packageId);
+
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    fetch("/api/packages").then(res => res.json()).then(data => setPackages(data.packages ?? []));
+  }, []);
+
+  const preselected = packages.find((p) => p.id === packageId);
 
   const [form, setForm] = useState({
     packageId: preselected?.id ?? "",

@@ -1,17 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Package as PackageIcon, ArrowLeft, Clock } from "lucide-react";
 import Image from "next/image";
 import ImageUploader from "@/components/admin/ImageUploader";
-import { useAdminPackages } from "@/hooks/useAdminPackages";
-import {
-  addPackage,
-  updatePackage,
-  deletePackage,
-  type AdminPackage,
-  type ItineraryDay,
-} from "@/lib/packagesStore";
+import type { AdminPackage, ItineraryDay } from "@/types/package";
 
 const emptyForm: AdminPackage = {
   id: "",
@@ -35,7 +28,10 @@ const emptyForm: AdminPackage = {
 };
 
 export default function AdminPackagesPage() {
-  const packages = useAdminPackages();
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [mode, setMode] = useState<"list" | "form">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<AdminPackage>(emptyForm);
@@ -45,6 +41,25 @@ export default function AdminPackagesPage() {
   const [excludesText, setExcludesText] = useState("");
   const [itineraryText, setItineraryText] = useState("");
 
+  useEffect(() => {
+    fetchPackages();
+  }, []);
+
+  async function fetchPackages() {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/packages");
+      if (!res.ok) throw new Error("Failed to load packages.");
+      const data = await res.json();
+      setPackages(data.packages);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function startAdd() {
     setEditingId(null);
     setForm(emptyForm);
@@ -53,6 +68,7 @@ export default function AdminPackagesPage() {
     setExcludesText("");
     setItineraryText("");
     setMode("form");
+    setError(null);
   }
 
   function startEdit(pkg: AdminPackage) {
@@ -65,6 +81,7 @@ export default function AdminPackagesPage() {
       pkg.itinerary.map((d) => `${d.day} | ${d.title} | ${d.description}`).join("\n")
     );
     setMode("form");
+    setError(null);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
@@ -91,8 +108,10 @@ export default function AdminPackagesPage() {
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     const payload: Omit<AdminPackage, "id"> = {
       ...form,
@@ -102,18 +121,47 @@ export default function AdminPackagesPage() {
       itinerary: parseItinerary(itineraryText),
     };
 
-    if (editingId) {
-      updatePackage(editingId, payload);
-    } else {
-      addPackage({ ...payload, id: slugify(form.title) });
+    try {
+      if (editingId) {
+        const updatedPackage = { ...payload, id: editingId };
+        const res = await fetch("/api/admin/packages", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedPackage),
+        });
+        if (!res.ok) throw new Error("Failed to update package.");
+        setPackages(packages.map((p) => (p.id === editingId ? updatedPackage : p)));
+      } else {
+        const newId = slugify(form.title);
+        const newPackage = { ...payload, id: newId };
+        const res = await fetch("/api/admin/packages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newPackage),
+        });
+        if (!res.ok) throw new Error("Failed to create package.");
+        setPackages([...packages, newPackage]);
+      }
+      setMode("list");
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
     }
-
-    setMode("list");
   }
 
-  function handleDelete(id: string, title: string) {
+  async function handleDelete(id: string, title: string) {
     if (confirm(`Delete "${title}"? This can't be undone.`)) {
-      deletePackage(id);
+      setError(null);
+      try {
+        const res = await fetch(`/api/admin/packages?id=${id}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Failed to delete package.");
+        setPackages(packages.filter((p) => p.id !== id));
+      } catch (err: any) {
+        setError(err.message);
+      }
     }
   }
 
@@ -127,6 +175,7 @@ export default function AdminPackagesPage() {
         <button
           onClick={() => setMode("list")}
           className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-700 mb-6 cursor-pointer"
+          disabled={isLoading}
         >
           <ArrowLeft size={15} />
           Back to Packages
@@ -136,56 +185,62 @@ export default function AdminPackagesPage() {
           {editingId ? "Edit Package" : "Add Package"}
         </h1>
 
+        {error && (
+          <div className="mb-6 p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5 bg-white border border-black/5 rounded-2xl p-6">
           <ImageUploader value={form.image} onChange={(url) => setForm({ ...form, image: url })} />
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Title</label>
-              <input name="title" required value={form.title} onChange={handleChange} className={inputClass()} />
+              <input name="title" required value={form.title} onChange={handleChange} className={inputClass()} disabled={isLoading} />
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Destination / Country</label>
-              <input name="destination" required value={form.destination} onChange={handleChange} className={inputClass()} />
+              <input name="destination" required value={form.destination} onChange={handleChange} className={inputClass()} disabled={isLoading} />
             </div>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Duration</label>
-              <input name="duration" required placeholder="7 Days" value={form.duration} onChange={handleChange} className={inputClass()} />
+              <input name="duration" required placeholder="7 Days" value={form.duration} onChange={handleChange} className={inputClass()} disabled={isLoading} />
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Price (USD)</label>
-              <input type="number" name="price" required min={0} value={form.price} onChange={handleChange} className={inputClass()} />
+              <input type="number" name="price" required min={0} value={form.price} onChange={handleChange} className={inputClass()} disabled={isLoading} />
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Badge <span className="text-zinc-400 font-normal">(optional)</span></label>
-              <input name="badge" placeholder="Popular, Offer, New..." value={form.badge ?? ""} onChange={(e) => setForm({ ...form, badge: e.target.value || null })} className={inputClass()} />
+              <input name="badge" placeholder="Popular, Offer, New..." value={form.badge ?? ""} onChange={(e) => setForm({ ...form, badge: e.target.value || null })} className={inputClass()} disabled={isLoading} />
             </div>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-1.5">Summary <span className="text-zinc-400 font-normal">(shown on cards, one line)</span></label>
-            <input name="summary" value={form.summary} onChange={handleChange} className={inputClass()} />
+            <input name="summary" value={form.summary} onChange={handleChange} className={inputClass()} disabled={isLoading} />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-1.5">Full Description</label>
-            <textarea name="description" required rows={3} value={form.description} onChange={handleChange} className={inputClass() + " resize-none"} />
+            <textarea name="description" required rows={3} value={form.description} onChange={handleChange} className={inputClass() + " resize-none"} disabled={isLoading} />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 mb-1.5">Highlights <span className="text-zinc-400 font-normal">(one per line)</span></label>
-            <textarea rows={3} value={highlightsText} onChange={(e) => setHighlightsText(e.target.value)} className={inputClass() + " resize-none"} />
+            <textarea rows={3} value={highlightsText} onChange={(e) => setHighlightsText(e.target.value)} className={inputClass() + " resize-none"} disabled={isLoading} />
           </div>
 
           <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400">Quick Facts (all optional)</p>
           <div className="grid sm:grid-cols-2 gap-4">
-            <input name="difficulty" placeholder="Difficulty (e.g. Easy)" value={form.difficulty} onChange={handleChange} className={inputClass()} />
-            <input name="bestSeason" placeholder="Best Season" value={form.bestSeason} onChange={handleChange} className={inputClass()} />
-            <input name="startingPoint" placeholder="Starting Point" value={form.startingPoint} onChange={handleChange} className={inputClass()} />
-            <input name="maxAltitude" placeholder="Max Altitude" value={form.maxAltitude} onChange={handleChange} className={inputClass()} />
+            <input name="difficulty" placeholder="Difficulty (e.g. Easy)" value={form.difficulty} onChange={handleChange} className={inputClass()} disabled={isLoading} />
+            <input name="bestSeason" placeholder="Best Season" value={form.bestSeason} onChange={handleChange} className={inputClass()} disabled={isLoading} />
+            <input name="startingPoint" placeholder="Starting Point" value={form.startingPoint} onChange={handleChange} className={inputClass()} disabled={isLoading} />
+            <input name="maxAltitude" placeholder="Max Altitude" value={form.maxAltitude} onChange={handleChange} className={inputClass()} disabled={isLoading} />
           </div>
 
           <div>
@@ -198,22 +253,23 @@ export default function AdminPackagesPage() {
               onChange={(e) => setItineraryText(e.target.value)}
               placeholder={"Day 1 | Arrival | Airport pickup and briefing"}
               className={inputClass() + " resize-none font-mono text-xs"}
+              disabled={isLoading}
             />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Includes <span className="text-zinc-400 font-normal">(one per line)</span></label>
-              <textarea rows={4} value={includesText} onChange={(e) => setIncludesText(e.target.value)} className={inputClass() + " resize-none"} />
+              <textarea rows={4} value={includesText} onChange={(e) => setIncludesText(e.target.value)} className={inputClass() + " resize-none"} disabled={isLoading} />
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">Excludes <span className="text-zinc-400 font-normal">(one per line)</span></label>
-              <textarea rows={4} value={excludesText} onChange={(e) => setExcludesText(e.target.value)} className={inputClass() + " resize-none"} />
+              <textarea rows={4} value={excludesText} onChange={(e) => setExcludesText(e.target.value)} className={inputClass() + " resize-none"} disabled={isLoading} />
             </div>
           </div>
 
-          <button type="submit" className="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-2.5 rounded-full transition-colors cursor-pointer">
-            {editingId ? "Save Changes" : "Add Package"}
+          <button type="submit" disabled={isLoading} className="bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-2.5 rounded-full transition-colors cursor-pointer disabled:opacity-50">
+            {isLoading ? "Saving..." : editingId ? "Save Changes" : "Add Package"}
           </button>
         </form>
       </div>
@@ -233,7 +289,17 @@ export default function AdminPackagesPage() {
         </button>
       </div>
 
-      {packages.length === 0 ? (
+      {error && (
+        <div className="mb-6 p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="text-center py-16 rounded-2xl border border-black/5 bg-white">
+          <p className="text-zinc-500">Loading packages...</p>
+        </div>
+      ) : packages.length === 0 ? (
         <div className="text-center py-16 rounded-2xl border border-black/5 bg-white">
           <p className="text-zinc-500">No packages yet.</p>
         </div>

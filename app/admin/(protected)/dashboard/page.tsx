@@ -1,8 +1,13 @@
 import { auth } from "@/auth";
-import { destinations, packages } from "@/lib/dummy-data";
+import clientPromise from "@/lib/mongodb";
 
 export default async function AdminDashboardPage() {
   const session = await auth();
+
+  const client = await clientPromise;
+  const db = client.db();
+  const packagesCount = await db.collection("packages").countDocuments();
+  const destinationsCount = await db.collection("destinations").countDocuments();
 
   return (
     <div>
@@ -19,11 +24,11 @@ export default async function AdminDashboardPage() {
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-6">
           <p className="text-xs text-zinc-400 uppercase tracking-wide">Destinations</p>
-          <p className="text-3xl font-heading font-bold text-zinc-900 mt-2">{destinations.length}</p>
+          <p className="text-3xl font-heading font-bold text-zinc-900 mt-2">{destinationsCount}</p>
         </div>
         <div className="rounded-2xl border border-black/5 bg-white p-6">
           <p className="text-xs text-zinc-400 uppercase tracking-wide">Packages</p>
-          <p className="text-3xl font-heading font-bold text-zinc-900 mt-2">{packages.length}</p>
+          <p className="text-3xl font-heading font-bold text-zinc-900 mt-2">{packagesCount}</p>
         </div>
       </div>
     </div>

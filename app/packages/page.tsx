@@ -1,14 +1,29 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import PackageCard from "@/components/shared/PackageCard";
-import { packages } from "@/lib/dummy-data";
+import { AdminPackage } from "@/types/package";
 
 function PackagesContent() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
+
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/packages")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load packages");
+        return res.json();
+      })
+      .then((data) => setPackages(data.packages))
+      .catch((err) => setError(err.message))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const filtered = packages.filter((p) =>
     `${p.title} ${p.destination}`.toLowerCase().includes(query.toLowerCase())
@@ -45,7 +60,11 @@ function PackagesContent() {
         )}
       </div>
 
-      {filtered.length > 0 ? (
+      {isLoading ? (
+        <div className="text-center py-12 text-zinc-500">Loading packages...</div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500">Error: {error}</div>
+      ) : filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {filtered.map((p) => (
             <PackageCard key={p.id} {...p} showViewDetail />
