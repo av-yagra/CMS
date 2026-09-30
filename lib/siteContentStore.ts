@@ -18,7 +18,7 @@ export type SiteContent = {
   footer: { tagline: string };
 };
 
-const defaultContent: SiteContent = {
+export const defaultContent: SiteContent = {
   hero: {
     eyebrow: "Nepal & Beyond",
     heading: "Discover Your Next Adventure",
@@ -88,59 +88,3 @@ const defaultContent: SiteContent = {
   },
 };
 
-const STORAGE_KEY = "paila-site-content";
-
-let currentValue: SiteContent = defaultContent;
-let listeners: (() => void)[] = [];
-let hasLoadedFromStorage = false;
-
-function loadFromStorage(): SiteContent {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? { ...defaultContent, ...JSON.parse(saved) } : defaultContent;
-  } catch {
-    return defaultContent;
-  }
-}
-
-function ensureLoaded() {
-  if (typeof window !== "undefined" && !hasLoadedFromStorage) {
-    currentValue = loadFromStorage();
-    hasLoadedFromStorage = true;
-  }
-}
-ensureLoaded();
-
-function persist() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentValue));
-  } catch {
-    // ignore, e.g. private browsing
-  }
-}
-
-function emitChange() {
-  for (const listener of listeners) listener();
-}
-
-export function subscribe(listener: () => void) {
-  listeners.push(listener);
-  return () => {
-    listeners = listeners.filter((l) => l !== listener);
-  };
-}
-
-export function getSnapshot(): SiteContent {
-  ensureLoaded();
-  return currentValue;
-}
-
-export function getServerSnapshot(): SiteContent {
-  return defaultContent;
-}
-
-export function saveSiteContent(content: SiteContent) {
-  currentValue = content;
-  persist();
-  emitChange();
-}

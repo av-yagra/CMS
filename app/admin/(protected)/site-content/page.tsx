@@ -1,23 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, Save, Star } from "lucide-react";
-import { useSiteContent } from "@/hooks/useSiteContent";
-import { saveSiteContent, type SiteContent } from "@/lib/siteContentStore";
+import { type SiteContent, defaultContent } from "@/lib/siteContentStore";
 
 export default function AdminSiteContentPage() {
-  const content = useSiteContent();
-  const [draft, setDraft] = useState<SiteContent>(content);
+  const [draft, setDraft] = useState<SiteContent | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  function save() {
-    saveSiteContent(draft);
-    setSavedFlash(true);
-    setTimeout(() => setSavedFlash(false), 2000);
+  useEffect(() => {
+    fetch('/api/admin/site-content')
+      .then(res => res.json())
+      .then(data => {
+        if (data.content) {
+          setDraft(data.content);
+        } else {
+          setDraft(defaultContent);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        setDraft(defaultContent);
+      });
+  }, []);
+
+  async function save() {
+    if (!draft) return;
+    setIsSaving(true);
+    try {
+      const res = await fetch('/api/admin/site-content', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draft)
+      });
+      if (res.ok) {
+        setSavedFlash(true);
+        setTimeout(() => setSavedFlash(false), 2000);
+      } else {
+        alert("Failed to save site content");
+      }
+    } catch (e) {
+      alert("An error occurred");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   function inputClass() {
     return "w-full px-3 py-2 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40";
+  }
+
+  if (!draft) {
+    return <div className="max-w-3xl pt-10 text-zinc-500">Loading editor...</div>;
   }
 
   return (
@@ -33,10 +68,11 @@ export default function AdminSiteContentPage() {
         </div>
         <button
           onClick={save}
-          className="flex items-center gap-1.5 bg-accent hover:bg-accent-dark text-white font-semibold px-4 py-2.5 rounded-full transition-colors cursor-pointer"
+          disabled={isSaving}
+          className="flex items-center gap-1.5 bg-accent hover:bg-accent-dark disabled:opacity-50 text-white font-semibold px-4 py-2.5 rounded-full transition-colors cursor-pointer"
         >
           <Save size={16} />
-          {savedFlash ? "Saved!" : "Save All Changes"}
+          {isSaving ? "Saving..." : savedFlash ? "Saved!" : "Save All Changes"}
         </button>
       </div>
 

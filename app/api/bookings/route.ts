@@ -2,16 +2,24 @@ import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { auth } from '@/auth';
 import { withAuth } from '@/lib/auth-utils';
-import { packages } from '@/lib/dummy-data';
 import { Booking } from '@/types/booking';
+import { AdminPackage } from '@/types/package';
 
 export async function POST(req: Request) {
     try {
         const body = await req.json();
         const { packageId, phone, nationality, travelers, expectedDate, details } = body;
 
+        const client = await clientPromise;
+        const db = client.db();
+
         // Validation
-        if (!packageId || typeof packageId !== 'string' || !packages.some(p => p.id === packageId)) {
+        if (!packageId || typeof packageId !== 'string') {
+            return NextResponse.json({ message: 'Valid packageId is required' }, { status: 400 });
+        }
+
+        const packageExists = await db.collection<AdminPackage>('packages').findOne({ id: packageId });
+        if (!packageExists) {
             return NextResponse.json({ message: 'Valid packageId is required' }, { status: 400 });
         }
         if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
@@ -56,8 +64,6 @@ export async function POST(req: Request) {
         // Fallback to "User" if name is missing from session, but it shouldn't be.
         const trustedName = (session.user.name || "User").trim();
 
-        const client = await clientPromise;
-        const db = client.db();
         const bookingsCollection = db.collection<Booking>('bookings');
 
         // Duplicate-submission protection:

@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
-import { destinations, packages } from "@/lib/dummy-data";
+import clientPromise from "@/lib/mongodb";
 import PackageCard from "@/components/shared/PackageCard";
+import { AdminPackage } from "@/types/package";
+import { BackendDestination } from "@/types/destination";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -11,32 +13,37 @@ type Props = {
 
 export default async function DestinationDetailPage({ params }: Props) {
   const { id } = await params;
-  const destination = destinations.find((d) => d.id === id);
+
+  const client = await clientPromise;
+  const db = client.db();
+
+  const destination = await db.collection<BackendDestination>("destinations").findOne({ slug: id });
 
   if (!destination) {
     notFound();
   }
 
-  const relatedPackages = packages.filter(
-    (p) => p.destination.toLowerCase() === destination.country.toLowerCase(),
-  );
+  const rawPackages = await db.collection<AdminPackage>("packages").find({
+    destination: { $regex: new RegExp(`^${destination.country}$`, "i") }
+  }).toArray();
+  const relatedPackages = rawPackages.map(({ _id, ...rest }) => rest);
 
   return (
     <>
       {/* Hero image */}
       <div className="relative h-105 md:h-150 w-full overflow-hidden">
-  <Image
-  src={destination.image}
-  alt={destination.name}
-  fill
-  priority
-  className="object-cover"
-  style={{
-    objectPosition: destination.imagePosition || "center",
-  }}
-/>
+        <Image
+          src={destination.image}
+          alt={destination.name}
+          fill
+          priority
+          className="object-cover"
+          style={{
+            objectPosition: destination.imagePosition || "center",
+          }}
+        />
         <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-<div className="absolute inset-0 flex flex-col items-center justify-end pb-10 text-center text-white px-6">
+        <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 text-center text-white px-6">
           <h1 className="font-heading text-4xl md:text-5xl font-bold">
             {destination.name}
           </h1>
@@ -54,27 +61,27 @@ export default async function DestinationDetailPage({ params }: Props) {
         </p>
       </section>
       {destination.highlights && destination.highlights.length > 0 && (
-  <section className="max-w-3xl mx-auto px-6 pb-12">
-    <h2 className="font-heading text-xl font-bold text-zinc-900 mb-4 text-center">
-      Highlights
-    </h2>
-    <ul className="grid sm:grid-cols-2 gap-3">
-      {destination.highlights.map((item) => (
-        <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
-          {item}
-        </li>
-      ))}
-    </ul>
+        <section className="max-w-3xl mx-auto px-6 pb-12">
+          <h2 className="font-heading text-xl font-bold text-zinc-900 mb-4 text-center">
+            Highlights
+          </h2>
+          <ul className="grid sm:grid-cols-2 gap-3">
+            {destination.highlights.map((item) => (
+              <li key={item} className="flex items-start gap-2 text-sm text-zinc-700">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1.5 shrink-0" />
+                {item}
+              </li>
+            ))}
+          </ul>
 
-    {destination.bestTimeToVisit && (
-      <div className="mt-6 rounded-xl bg-primary/5 border border-primary/10 px-5 py-4 text-sm text-zinc-700 text-center">
-        <span className="font-semibold text-primary">Best time to visit:</span>{" "}
-        {destination.bestTimeToVisit}
-      </div>
-    )}
-  </section>
-)}
+          {destination.bestTimeToVisit && (
+            <div className="mt-6 rounded-xl bg-primary/5 border border-primary/10 px-5 py-4 text-sm text-zinc-700 text-center">
+              <span className="font-semibold text-primary">Best time to visit:</span>{" "}
+              {destination.bestTimeToVisit}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Related packages */}
       {relatedPackages.length > 0 && (

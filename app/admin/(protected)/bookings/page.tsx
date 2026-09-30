@@ -11,7 +11,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import { packages } from "@/lib/dummy-data";
+import { AdminPackage } from "@/types/package";
 
 type Booking = {
   _id: string;
@@ -35,22 +35,28 @@ const statusStyles: Record<Booking["status"], string> = {
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchBookings() {
+    async function fetchAll() {
       try {
-        const res = await fetch("/api/bookings");
-        const data = await res.json();
+        const [resBookings, resPackages] = await Promise.all([
+          fetch("/api/bookings"),
+          fetch("/api/packages")
+        ]);
+        const dataB = await resBookings.json();
+        const dataP = await resPackages.json();
 
-        if (!res.ok) {
-          setError(data.message ?? "Failed to load bookings");
+        if (!resBookings.ok) {
+          setError(dataB.message ?? "Failed to load bookings");
           return;
         }
 
-        setBookings(data.bookings ?? []);
+        setBookings(dataB.bookings ?? []);
+        setPackages(dataP.packages ?? []);
       } catch {
         setError("Could not reach the server");
       } finally {
@@ -58,7 +64,7 @@ export default function AdminBookingsPage() {
       }
     }
 
-    fetchBookings();
+    fetchAll();
   }, []);
 
   function packageTitle(packageId: string) {

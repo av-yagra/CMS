@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, MapPinned, Wallet, HeadphonesIcon } from "lucide-react";
 import DestinationCard from "@/components/shared/DestinationCard";
@@ -7,19 +8,12 @@ import PackageCard from "@/components/shared/PackageCard";
 import DestinationStrip from "@/components/shared/DestinationStrip";
 import StatsCounter from "@/components/shared/StatsCounter";
 import Testimonials from "@/components/shared/Testimonials";
-import { destinations, packages } from "@/lib/dummy-data";
+import { destinations } from "@/lib/dummy-data";
 import { useSiteContent } from "@/hooks/useSiteContent";
 
 import HeroSlideshow from "@/components/shared/HeroSlideshow";
 import HeroSearch from "@/components/shared/HeroSearch";
-
-const heroImages = [
-  { id: "pokhara", image: destinations[0].image, imagePosition: destinations[0].imagePosition, name: destinations[0].name },
-  { id: "everest-base-camp", image: packages[0].image, name: packages[0].title },
-  { id: "santorini", image: destinations[2].image, imagePosition: destinations[2].imagePosition, name: destinations[2].name },
-  { id: "bali-getaway", image: packages[1].image, name: packages[1].title },
-  { id: "dubai", image: destinations[5].image, imagePosition: destinations[5].imagePosition, name: destinations[5].name },
-];
+import { AdminPackage } from "@/types/package";
 
 // Icons/tints stay fixed (not admin-editable); only title/text come from Site Content
 const whyChooseUsVisuals = [
@@ -31,6 +25,19 @@ const whyChooseUsVisuals = [
 
 export default function Home() {
   const content = useSiteContent();
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
+
+  useEffect(() => {
+    fetch("/api/packages").then(res => res.json()).then(data => setPackages(data.packages ?? []));
+  }, []);
+
+  const heroImages = [
+    { id: "pokhara", image: destinations[0].image, imagePosition: destinations[0].imagePosition, name: destinations[0].name },
+    ...(packages[0] ? [{ id: packages[0].id, image: packages[0].image, name: packages[0].title }] : []),
+    { id: "santorini", image: destinations[2].image, imagePosition: destinations[2].imagePosition, name: destinations[2].name },
+    ...(packages[1] ? [{ id: packages[1].id, image: packages[1].image, name: packages[1].title }] : []),
+    { id: "dubai", image: destinations[5].image, imagePosition: destinations[5].imagePosition, name: destinations[5].name },
+  ];
 
   return (
     <>
@@ -144,9 +151,8 @@ export default function Home() {
                   className="text-center p-6 rounded-2xl border border-black/5 hover:border-black/10 hover:-translate-y-1 transition-all duration-200"
                 >
                   <div
-                    className={`mx-auto w-12 h-12 flex items-center justify-center rounded-xl mb-4 ${
-                      tint === "primary" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
-                    }`}
+                    className={`mx-auto w-12 h-12 flex items-center justify-center rounded-xl mb-4 ${tint === "primary" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
+                      }`}
                   >
                     <Icon size={22} />
                   </div>

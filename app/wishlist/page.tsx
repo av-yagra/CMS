@@ -1,14 +1,21 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
-import { destinations, packages } from "@/lib/dummy-data";
+import { destinations } from "@/lib/dummy-data";
 import DestinationCard from "@/components/shared/DestinationCard";
 import PackageCard from "@/components/shared/PackageCard";
+import { AdminPackage } from "@/types/package";
 
 export default function WishlistPage() {
   const { wishlist } = useWishlist();
+  const [packages, setPackages] = useState<AdminPackage[]>([]);
+
+  useEffect(() => {
+    fetch("/api/packages").then(res => res.json()).then(data => setPackages(data.packages ?? []));
+  }, []);
 
   const savedDestinations = destinations.filter((d) => wishlist.includes(d.id));
   const savedPackages = packages.filter((p) => wishlist.includes(p.id));
