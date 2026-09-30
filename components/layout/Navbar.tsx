@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
@@ -21,6 +22,7 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
   const { wishlist } = useWishlist();
+  const pathname = usePathname();
 
   // Nav shadow on scroll
   useEffect(() => {
@@ -45,6 +47,14 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Scroll to top if the logo is clicked while already on the homepage
+  function handleLogoClick(e: React.MouseEvent) {
+    if (pathname === "/") {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
   return (
     <header
       className={`sticky top-0 z-50 bg-white border-b border-black/10 shadow-sm transition-shadow ${
@@ -52,10 +62,8 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="font-heading font-bold text-xl text-primary">
-            Paila
-          </span>
+        <Link href="/" onClick={handleLogoClick} className="flex items-center gap-2">
+          <span className="font-heading font-bold text-xl text-primary">Paila</span>
         </Link>
 
         {/* Desktop nav */}

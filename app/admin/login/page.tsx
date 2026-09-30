@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { ShieldCheck, Eye, EyeOff, X } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -15,11 +15,11 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
 
   // Redirect if already logged in as admin
-useEffect(() => {
-  if (session?.user?.role === "admin") {
-    router.push("/admin/dashboard");
-  }
-}, [session, router]);
+  useEffect(() => {
+    if (session?.user?.role === "admin") {
+      router.push("/admin/dashboard");
+    }
+  }, [session, router]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -48,11 +48,10 @@ useEffect(() => {
 
     if (session?.user?.role !== "admin") {
       setError("This account doesn't have admin access.");
-      await fetch("/api/auth/signout", { method: "POST" }).catch(() => { });
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
       setLoading(false);
       return;
     }
-
 
     router.push("/admin/dashboard");
     router.refresh();
@@ -64,7 +63,9 @@ useEffect(() => {
         <div className="mx-auto w-12 h-12 flex items-center justify-center rounded-xl bg-surface-dark text-white mb-4">
           <ShieldCheck size={22} />
         </div>
-        <h1 className="font-heading text-2xl font-bold text-zinc-900">Admin Login</h1>
+        <h1 className="font-heading text-2xl font-bold text-zinc-900">
+          Admin Login
+        </h1>
         <p className="text-sm text-zinc-600 mt-1">Restricted access.</p>
       </div>
 
@@ -76,22 +77,40 @@ useEffect(() => {
         )}
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-zinc-700 mb-1.5">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-zinc-700 mb-1.5"
+          >
             Email
           </label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-            value={form.email}
-            onChange={handleChange}
-            className="w-full px-4 py-2.5 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
+          <div className="relative">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2.5 pr-10 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            />
+            {form.email.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, email: "" })}
+                aria-label="Clear email"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-zinc-700 mb-1.5">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-zinc-700 mb-1.5"
+          >
             Password
           </label>
           <div className="relative">
@@ -102,8 +121,18 @@ useEffect(() => {
               required
               value={form.password}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 pr-11 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              className="w-full px-4 py-2.5 pr-20 rounded-lg border border-black/10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
             />
+            {form.password.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, password: "" })}
+                aria-label="Clear password"
+                className="absolute right-10 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setShowPassword((prev) => !prev)}
