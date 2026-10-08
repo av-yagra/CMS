@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Menu, X, Heart, LogOut } from "lucide-react";
+import { Menu, X, Heart, LogOut, LayoutDashboard } from "lucide-react";
 import { useWishlist } from "@/context/WishlistContext";
 
 const navLinks = [
@@ -93,6 +93,23 @@ export default function Navbar() {
             )}
           </Link>
 
+          {status === "unauthenticated" && (
+            <div className="hidden sm:flex items-center gap-3">
+              <Link
+                href="/login"
+                className="text-sm font-medium text-zinc-700 hover:text-primary transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 px-4 py-2 rounded-full transition-colors"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
+
           {status === "authenticated" && session.user?.role === "admin" && (
             <Link
               href="/admin/dashboard"
@@ -121,12 +138,22 @@ export default function Navbar() {
                   <p className="text-xs text-zinc-500 break-all mt-0.5">
                     {session.user?.email}
                   </p>
+
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setProfileOpen(false)}
+                    className="mt-3 w-full flex items-center justify-center gap-2 text-sm font-semibold text-primary border border-primary/20 hover:bg-primary/5 rounded-full py-2 transition-colors"
+                  >
+                    <LayoutDashboard size={15} />
+                    My Dashboard
+                  </Link>
+
                   <button
                     onClick={() => {
                       setProfileOpen(false);
                       signOut({ callbackUrl: "/" });
                     }}
-                    className="mt-3 w-full flex items-center justify-center gap-2 text-sm font-semibold text-red-500 border border-red-100 hover:bg-red-50 rounded-full py-2 transition-colors cursor-pointer"
+                    className="mt-2 w-full flex items-center justify-center gap-2 text-sm font-semibold text-red-500 border border-red-100 hover:bg-red-50 rounded-full py-2 transition-colors cursor-pointer"
                   >
                     <LogOut size={15} />
                     Log Out
@@ -135,6 +162,13 @@ export default function Navbar() {
               )}
             </div>
           )}
+
+          <Link
+            href="/packages"
+            className="hidden sm:inline-block bg-accent hover:bg-accent-dark text-white text-sm font-semibold px-4 py-2 rounded-full transition-colors"
+          >
+            Book Now
+          </Link>
 
           <button
             onClick={() => setIsOpen(!isOpen)}
@@ -170,6 +204,25 @@ export default function Navbar() {
           </Link>
 
           <div className="border-t border-black/5 pt-4">
+            {status === "unauthenticated" && (
+              <div className="flex flex-col gap-3">
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-zinc-700"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setIsOpen(false)}
+                  className="text-sm font-medium text-primary"
+                >
+                  Sign up
+                </Link>
+              </div>
+            )}
+
             {status === "authenticated" && session.user?.role === "admin" && (
               <Link
                 href="/admin/dashboard"
@@ -188,6 +241,14 @@ export default function Navbar() {
                 <p className="text-xs text-zinc-500 mt-0.5">
                   {session.user?.email}
                 </p>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-primary"
+                >
+                  <LayoutDashboard size={15} />
+                  My Dashboard
+                </Link>
                 <button
                   onClick={() => {
                     setIsOpen(false);
